@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://0-draft.github.io/php2shell-anatomy/sitemap-index.xml

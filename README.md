@@ -28,6 +28,7 @@ Bilingual (English default, Japanese toggle).
 - Hand-written CSS, a deliberate forensic-console visual identity.
 - [Vitest](https://vitest.dev/) unit tests + [Playwright](https://playwright.dev/) end-to-end tests.
 - ESLint + Prettier, GitHub Actions CI, Dependabot.
+- Sitemap, robots.txt, and an Open Graph share image.
 
 ## Develop
 
@@ -55,6 +56,10 @@ Technical claims are drawn from public reporting and may change once PHP publish
 - SecurityWeek: mass exploitation looms for leaked PHP flaws
 - CERT-EU: Security Advisory 2026-018
 - CISA: Known Exploited Vulnerabilities catalog
+
+## License
+
+[MIT](LICENSE)
 
 ---
 

@@ -632,7 +632,7 @@ export const content: Record<Lang, Record<string, any>> = {
       ['8.1', 'eol', '修正なし(EOL)', '今すぐ 8.2+ へアップグレード'],
       ['8.0 / 7.x / 5.x', 'eol', '修正なし(EOL)', 'サポート対象ブランチへ移行'],
     ],
-    mxTargetsLead: 'とりわけ、以下などで実証されたと報じられている:',
+    mxTargetsLead: 'とりわけ、以下などで実証されたと報じられている。',
     targets: [
       'WordPress',
       'Drupal',
