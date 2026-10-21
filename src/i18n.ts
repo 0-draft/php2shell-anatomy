@@ -137,6 +137,37 @@ export const content: Record<Lang, Record<string, any>> = {
       ],
     ],
 
+    seqPlay: 'Play the attack',
+    seqReplay: 'Replay',
+    seqThreat: 'threat',
+    seqNodes: {
+      attacker: 'Attacker',
+      edge: 'Edge / WAF',
+      web: 'Your PHP server',
+      db: 'Database',
+      internal: 'Internal network',
+    },
+    attackTerm: [
+      [
+        '$ mass-scan 0.0.0.0/0 :80,443',
+        '[+] 4,812,339 PHP hosts fingerprinted',
+        '[>] target.example.com → PHP 8.3 · in range',
+      ],
+      [
+        '[*] one ordinary POST → /any.php',
+        '[+] 200 OK · no auth, nothing in the app log',
+        '[+] code execution as www-data',
+      ],
+      ['$ id → uid=33(www-data)', '$ cat config.php', '[+] DB_PASS and API keys captured'],
+      ['[*] dumping users …', '[+] 2,391,114 records exfiltrated', '[+] 17 live API keys taken'],
+      [
+        '$ mysql -h db-internal …',
+        '[+] pivoted into 10.0.0.0/24',
+        '[+] 3 internal hosts reachable',
+      ],
+      ['[*] planting backdoor …', '[+] persistence established', '[!] ransomware staged'],
+    ],
+
     nmExp: 'Exposure check',
     expH: 'Are you exposed?',
     expLead:
@@ -445,6 +476,37 @@ export const content: Record<Lang, Record<string, any>> = {
         '隠しバックドアが残され、ランサムウェアが仕込まれることもある。穴を塞いでも、既に入った者は追い出せない。',
         '潜伏・身代金・サービス停止。',
       ],
+    ],
+
+    seqPlay: '攻撃を再生',
+    seqReplay: 'もう一度',
+    seqThreat: '脅威度',
+    seqNodes: {
+      attacker: '攻撃者',
+      edge: 'エッジ / WAF',
+      web: 'あなたのPHPサーバー',
+      db: 'データベース',
+      internal: '内部ネットワーク',
+    },
+    attackTerm: [
+      [
+        '$ 0.0.0.0/0 を一斉スキャン :80,443',
+        '[+] PHPホスト 4,812,339 台を特定',
+        '[>] target.example.com → PHP 8.3 ・範囲内',
+      ],
+      [
+        '[*] ごく普通の POST を /any.php へ',
+        '[+] 200 OK ・認証なし・アプリのログに残らず',
+        '[+] www-data 権限でコード実行',
+      ],
+      ['$ id → uid=33(www-data)', '$ cat config.php', '[+] DB_PASS・APIキーを取得'],
+      [
+        '[*] users テーブルを吸い出し …',
+        '[+] 2,391,114 件を外部送信',
+        '[+] 有効なAPIキー 17 本を奪取',
+      ],
+      ['$ mysql -h db-internal …', '[+] 10.0.0.0/24 へ横移動', '[+] 内部ホスト 3 台に到達'],
+      ['[*] バックドアを設置 …', '[+] 永続化を確立', '[!] ランサムウェアを配置'],
     ],
 
     nmExp: '露出チェック',

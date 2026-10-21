@@ -26,8 +26,31 @@ let cur: Lang = lsGet('p2s_lang') === 'ja' ? 'ja' : 'en';
 const expState = { ver: '8.3', waf: 'unknown' };
 let howTimer: ReturnType<typeof setInterval> | null = null;
 let howIdx = 0;
-let seqTimer: ReturnType<typeof setInterval> | null = null;
-let seqIdx = 0;
+// attack playback state
+const ATK_LAST = 5;
+const ATK_THREAT = [15, 40, 55, 75, 90, 100];
+// node class per stage (attacker is always the red source); others escalate
+const ATK_NODES: Record<string, string>[] = [
+  { attacker: 'breach', web: 'scan' },
+  { attacker: 'breach', edge: 'bypass', web: 'breach' },
+  { attacker: 'breach', edge: 'bypass', web: 'breach' },
+  { attacker: 'breach', edge: 'bypass', web: 'breach' },
+  { attacker: 'breach', edge: 'bypass', web: 'breach', db: 'breach', internal: 'reach' },
+  { attacker: 'breach', edge: 'bypass', web: 'breach', db: 'breach', internal: 'breach' },
+];
+const ATK_PULSE = ['web', 'web', 'web', 'web', 'internal', 'web'];
+const ATK_HOTLINKS = [0, 2, 2, 2, 4, 4]; // how many links (from left) are "hot" per stage
+const ATK_STATUS: Record<string, string> = {
+  scan: 'TARGET',
+  bypass: 'BYPASSED',
+  breach: 'OWNED',
+  reach: 'REACHED',
+};
+let atkStage = 0;
+let atkLinesStage = -1; // how many stages of terminal lines are currently painted
+let atkPlaying = false;
+let atkStarted = false; // autoplay-once guard
+let atkStepTimer: ReturnType<typeof setTimeout> | null = null;
 
 const reduce =
   typeof window !== 'undefined' &&
@@ -126,19 +149,11 @@ function render(): void {
       )
       .join('');
 
-  const seq = byId('seq');
-  if (seq)
-    seq.innerHTML = (t.attackSeq as string[][])
-      .map(
-        (s, i) =>
-          `<div class="seq-item" data-s="${i}" style="--sev:${i}"><div class="seq-rail"><span class="seq-n">${String(i + 1).padStart(2, '0')}</span><span class="seq-line"></span></div><div class="seq-body"><div class="seq-stage">${esc(s[0])}</div><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p><div class="seq-dmg"><span class="seq-dmg-k">${esc(t.seqDamage)}</span>${esc(s[3])}</div></div></div>`,
-      )
-      .join('');
+  renderAtk();
 
   renderVerdict();
   renderStatus();
   restartHow();
-  restartSeq();
 }
 
 function renderStatus(): void {
@@ -208,29 +223,156 @@ function restartHow(): void {
   howTimer = setInterval(cycleHow, 2600);
 }
 
-function cycleSeq(): void {
-  const items = document.querySelectorAll<HTMLElement>('#seq .seq-item');
-  if (!items.length) return;
-  // seqIdx runs 0..length; at === length the whole chain shows "done", then resets.
-  items.forEach((it, i) => {
-    it.classList.toggle('active', i === seqIdx);
-    it.classList.toggle('done', i < seqIdx);
-  });
-  seqIdx = seqIdx >= items.length ? 0 : seqIdx + 1;
+function atkNodeStatus(node: string, cls: string | undefined): string {
+  if (node === 'attacker') return 'SOURCE';
+  return cls ? (ATK_STATUS[cls] ?? '') : '';
 }
-function restartSeq(): void {
-  if (seqTimer) {
-    clearInterval(seqTimer);
-    seqTimer = null;
+
+function paintAtkMeta(stage: number): void {
+  const t = d();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const stageNo = byId('atkStageNo');
+  if (stageNo) stageNo.textContent = `${pad(stage + 1)} / 06`;
+  const meter = byId('atkMeter');
+  if (meter) meter.style.width = `${ATK_THREAT[stage]}%`;
+  const tv = byId('atkThreatV');
+  if (tv) tv.textContent = String(ATK_THREAT[stage]);
+
+  const sched = ATK_NODES[stage];
+  document.querySelectorAll<HTMLElement>('#atkMap .atk-node').forEach((el) => {
+    const node = el.getAttribute('data-node') ?? '';
+    el.classList.remove('scan', 'bypass', 'breach', 'reach', 'pulse');
+    const cls = sched[node];
+    if (cls) el.classList.add(cls);
+    if (ATK_PULSE[stage] === node) el.classList.add('pulse');
+    const st = el.querySelector<HTMLElement>('.atk-st');
+    if (st) st.textContent = atkNodeStatus(node, cls);
+  });
+
+  const hot = ATK_HOTLINKS[stage];
+  document.querySelectorAll<HTMLElement>('#atkMap .atk-link').forEach((el, i) => {
+    el.classList.toggle('hot', i < hot);
+  });
+
+  const cap = byId('atkCaption');
+  if (cap) {
+    const s = (t.attackSeq as string[][])[stage];
+    cap.innerHTML =
+      `<div class="cst">${esc(s[0])}</div><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p>` +
+      `<div class="cdmg"><span class="cdmg-k">${esc(t.seqDamage)}</span>${esc(s[3])}</div>`;
   }
-  seqIdx = 0;
-  const items = document.querySelectorAll<HTMLElement>('#seq .seq-item');
+
+  document.querySelectorAll<HTMLElement>('#atkPips button').forEach((el, i) => {
+    el.classList.toggle('done', i < stage);
+    el.classList.toggle('active', i === stage);
+  });
+}
+
+function atkLineClass(line: string): string {
+  if (line.startsWith('[!]')) return 'l bad';
+  if (line.startsWith('[+]') || line.startsWith('[>]')) return 'l ok';
+  if (line.startsWith('$')) return 'l cmd';
+  return 'l';
+}
+function appendStageLines(stage: number, stagger: boolean): void {
+  const term = byId('atkTerm');
+  if (!term) return;
+  const lines = (d().attackTerm as string[][])[stage] ?? [];
+  lines.forEach((line, i) => {
+    const el = document.createElement('div');
+    el.className = atkLineClass(line);
+    el.textContent = line;
+    if (stagger) el.style.animationDelay = `${i * 0.12}s`;
+    term.appendChild(el);
+  });
+  term.scrollTop = term.scrollHeight;
+}
+function rebuildTerm(uptoStage: number): void {
+  const term = byId('atkTerm');
+  if (!term) return;
+  term.innerHTML = '';
+  for (let s = 0; s <= uptoStage; s++) appendStageLines(s, false);
+  atkLinesStage = uptoStage;
+}
+
+function setAtkStage(i: number, animate: boolean): void {
+  atkStage = i;
+  paintAtkMeta(i);
+  if (animate && i === atkLinesStage + 1) {
+    appendStageLines(i, true);
+    atkLinesStage = i;
+  } else {
+    rebuildTerm(i);
+  }
+}
+
+function updateAtkPlayBtn(): void {
+  const t = d();
+  const btn = byId('atkPlay');
+  const label = byId('atkPlayL');
+  const ic = document.querySelector<HTMLElement>('#atkPlay .atk-play-ic');
+  if (!btn || !label) return;
+  btn.classList.toggle('playing', atkPlaying);
+  const done = !atkPlaying && atkStage >= ATK_LAST && atkLinesStage >= ATK_LAST;
+  label.textContent = done ? t.seqReplay : t.seqPlay;
+  if (ic) ic.textContent = done ? '⟲' : '▶';
+}
+
+function stopAtk(): void {
+  if (atkStepTimer) {
+    clearTimeout(atkStepTimer);
+    atkStepTimer = null;
+  }
+  atkPlaying = false;
+}
+
+function atkStep(): void {
+  atkStepTimer = setTimeout(() => {
+    if (atkStage >= ATK_LAST) {
+      atkPlaying = false;
+      updateAtkPlayBtn();
+      return;
+    }
+    setAtkStage(atkStage + 1, true);
+    updateAtkPlayBtn();
+    atkStep();
+  }, 2200);
+}
+
+function playAtk(): void {
   if (reduce) {
-    items.forEach((it) => it.classList.add('active', 'done'));
+    setAtkStage(ATK_LAST, false);
+    updateAtkPlayBtn();
     return;
   }
-  cycleSeq();
-  seqTimer = setInterval(cycleSeq, 2100);
+  if (atkPlaying) return;
+  if (atkStage >= ATK_LAST && atkLinesStage >= ATK_LAST) {
+    atkLinesStage = -1;
+    setAtkStage(0, true);
+  }
+  atkPlaying = true;
+  updateAtkPlayBtn();
+  atkStep();
+}
+
+function renderAtk(): void {
+  const t = d();
+  const nodes = t.seqNodes as Record<string, string>;
+  document.querySelectorAll<HTMLElement>('#atkMap .atk-node').forEach((el) => {
+    const node = el.getAttribute('data-node') ?? '';
+    const nl = el.querySelector<HTMLElement>('.atk-nl');
+    if (nl && nodes[node]) nl.textContent = nodes[node];
+  });
+  const pips = byId('atkPips');
+  if (pips && !pips.children.length) {
+    pips.innerHTML = (t.attackSeq as string[][])
+      .map((_s, i) => `<button type="button" data-p="${i}" aria-label="stage ${i + 1}"></button>`)
+      .join('');
+  }
+  stopAtk();
+  atkLinesStage = -1;
+  setAtkStage(reduce ? ATK_LAST : atkStage, false);
+  updateAtkPlayBtn();
 }
 
 export function init(): void {
@@ -257,6 +399,44 @@ export function init(): void {
       lsSet('p2s_lang', cur);
       render();
     });
+
+  const atkPlay = byId('atkPlay');
+  if (atkPlay)
+    atkPlay.addEventListener('click', () => {
+      atkStarted = true;
+      if (atkPlaying) {
+        stopAtk();
+        updateAtkPlayBtn();
+      } else {
+        playAtk();
+      }
+    });
+  const atkPips = byId('atkPips');
+  if (atkPips)
+    atkPips.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest('button');
+      if (!b) return;
+      atkStarted = true;
+      stopAtk();
+      setAtkStage(Number(b.getAttribute('data-p')), false);
+      updateAtkPlayBtn();
+    });
+  const atk = byId('atk');
+  if (atk && 'IntersectionObserver' in window && !reduce) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (en.isIntersecting && !atkStarted) {
+            atkStarted = true;
+            playAtk();
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(atk);
+  }
 
   const rail = document.querySelector<HTMLElement>('.rail');
   const onScroll = () => {

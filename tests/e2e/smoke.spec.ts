@@ -7,8 +7,9 @@ test('renders the page with live status and no app errors', async ({ page }) => 
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
     const text = m.text();
-    // External font/network hiccups are not app bugs.
-    if (/fonts\.g|favicon|net::ERR/i.test(text)) return;
+    // External fonts and the optional PM avatar (handled by an onerror fallback)
+    // are not app bugs.
+    if (/fonts\.g|favicon|pm-avatar|net::ERR/i.test(text)) return;
     errors.push(text);
   });
   page.on('pageerror', (e) => errors.push(e.message));
