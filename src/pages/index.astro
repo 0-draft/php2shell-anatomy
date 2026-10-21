@@ -23,7 +23,7 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
     <meta property="og:title" content="php2shell Anatomy" />
     <meta
       property="og:description"
-      content="One plain POST, and PHP is theirs. A defensive dissection of the php2shell zero-day — patch before it reaches you."
+      content="One plain POST, and PHP is theirs. A defensive dissection of the php2shell zero-day. Patch before it reaches you."
     />
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -76,7 +76,7 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
           </div>
           <div class="status-body">
             <div class="status-big" id="statusBig">
-              —
+              …
             </div>
             <p class="status-note" id="statusNote" set:html={en.preNote} />
           </div>
@@ -100,20 +100,54 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
           <span class="pm-kicker" data-i="pmKicker">
             {en.pmKicker}
           </span>
-          <span class="pm-trend">x.com · 2026-10-21</span>
+          <svg class="pm-xlogo" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+            ></path>
+          </svg>
         </div>
         <div class="pm-body">
           <h2 data-i="pmTitle">{en.pmTitle}</h2>
-          <blockquote class="pm-quote" data-i="pmQuote">
-            {en.pmQuote}
-          </blockquote>
-          <div class="pm-attrib">
-            <span class="check">◆</span>
-            <span data-i="pmAttrib">{en.pmAttrib}</span>
-            <a href={pmUrl} target="_blank" rel="noopener" data-i="pmSourceLabel">
-              {en.pmSourceLabel}
-            </a>
-          </div>
+
+          <article class="xcard">
+            <header class="xcard-top">
+              <div class="xcard-av" data-i="pmMonogram" aria-hidden="true">
+                {en.pmMonogram}
+              </div>
+              <div class="xcard-id">
+                <div class="xcard-name">
+                  <span data-i="pmName">{en.pmName}</span>
+                  <svg
+                    class="xcard-check"
+                    viewBox="0 0 22 22"
+                    width="16"
+                    height="16"
+                    aria-label="verified"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M20.4 11c0-1.1-.6-2-1.5-2.5.2-.3.3-.7.3-1.1 0-1.3-1-2.3-2.3-2.3-.4 0-.8.1-1.1.3C15.3 4.6 14.4 4 13.3 4c-1 0-1.9.6-2.3 1.4C10.6 5.1 10.2 5 9.8 5 8.5 5 7.5 6 7.5 7.4c0 .4.1.8.3 1.1C7 9 6.4 9.9 6.4 11s.6 2 1.5 2.5c-.2.3-.3.7-.3 1.1 0 1.3 1 2.3 2.3 2.3.4 0 .8-.1 1.1-.3.5.9 1.4 1.5 2.5 1.5s1.9-.6 2.3-1.4c.3.2.7.3 1.1.3 1.3 0 2.3-1 2.3-2.3 0-.4-.1-.8-.3-1.1.9-.6 1.5-1.5 1.5-2.6zm-9.9 3.3-2.6-2.6 1.1-1.1 1.5 1.5 3.5-3.5 1.1 1.1z"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="xcard-handle" data-i="pmHandle">
+                  {en.pmHandle}
+                </div>
+              </div>
+              <a class="xcard-src" href={pmUrl} target="_blank" rel="noopener" data-i="pmViewOn">
+                {en.pmViewOn}
+              </a>
+            </header>
+            <div class="xcard-text" data-i="pmBody" set:html={en.pmBody} />
+            <footer class="xcard-foot">
+              <span data-i="pmTime">{en.pmTime}</span> ·
+              <span class="xcard-views" data-i="pmViews">
+                {en.pmViews}
+              </span>
+            </footer>
+          </article>
+
           <p class="pm-quip" data-i="pmQuip" set:html={en.pmQuip} />
         </div>
       </section>
@@ -170,11 +204,47 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
         </div>
       </section>
 
+      <!-- ATTACK SEQUENCE -->
+      <section class="plate" id="sequence">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 03</span>
+          <span class="nm" data-i="nmSeq">
+            {en.nmSeq}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="seqH">
+          {en.seqH}
+        </h2>
+        <p class="lead" data-i="seqLead">
+          {en.seqLead}
+        </p>
+        <div class="seq mt" id="seq">
+          {en.attackSeq.map((s: string[], i: number) => (
+            <div class="seq-item" data-s={i} style={`--sev:${i}`}>
+              <div class="seq-rail">
+                <span class="seq-n">{String(i + 1).padStart(2, '0')}</span>
+                <span class="seq-line" />
+              </div>
+              <div class="seq-body">
+                <div class="seq-stage">{s[0]}</div>
+                <h3>{s[1]}</h3>
+                <p>{s[2]}</p>
+                <div class="seq-dmg">
+                  <span class="seq-dmg-k">{en.seqDamage}</span>
+                  {s[3]}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <!-- EXPOSURE -->
       <section class="plate" id="exposure">
         <div class="eyebrow">
           <span class="dot"></span>
-          <span class="no">Plate 03</span>
+          <span class="no">Plate 04</span>
           <span class="nm" data-i="nmExp">
             {en.nmExp}
           </span>
@@ -204,7 +274,7 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
       <section class="plate" id="timeline">
         <div class="eyebrow">
           <span class="dot"></span>
-          <span class="no">Plate 04</span>
+          <span class="no">Plate 05</span>
           <span class="nm" data-i="nmTl">
             {en.nmTl}
           </span>
@@ -235,7 +305,7 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
       <section class="plate" id="blast">
         <div class="eyebrow">
           <span class="dot"></span>
-          <span class="no">Plate 05</span>
+          <span class="no">Plate 06</span>
           <span class="nm" data-i="nmMx">
             {en.nmMx}
           </span>
@@ -274,7 +344,7 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
       <section class="plate" id="defense">
         <div class="eyebrow">
           <span class="dot"></span>
-          <span class="no">Plate 06</span>
+          <span class="no">Plate 07</span>
           <span class="nm" data-i="nmDef">
             {en.nmDef}
           </span>
@@ -314,7 +384,7 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
             target="_blank"
             rel="noopener"
           >
-            <span class="rk">[THN]</span> php2shell — what actually protects you
+            <span class="rk">[THN]</span> php2shell: what actually protects you
           </a>
           <a
             href="https://www.securityweek.com/php2shell-mass-exploitation-looms-for-leaked-critical-php-flaws/"

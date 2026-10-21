@@ -12,4 +12,8 @@ export default [
     languageOptions: { globals: { ...globals.browser } },
     rules: { '@typescript-eslint/no-explicit-any': 'off' },
   },
+  {
+    files: ['**/*.config.{ts,js,mjs}', 'scripts/**', 'tests/**'],
+    languageOptions: { globals: { ...globals.node } },
+  },
 ];

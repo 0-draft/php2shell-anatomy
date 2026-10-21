@@ -26,6 +26,8 @@ let cur: Lang = lsGet('p2s_lang') === 'ja' ? 'ja' : 'en';
 const expState = { ver: '8.3', waf: 'unknown' };
 let howTimer: ReturnType<typeof setInterval> | null = null;
 let howIdx = 0;
+let seqTimer: ReturnType<typeof setInterval> | null = null;
+let seqIdx = 0;
 
 const reduce =
   typeof window !== 'undefined' &&
@@ -124,9 +126,19 @@ function render(): void {
       )
       .join('');
 
+  const seq = byId('seq');
+  if (seq)
+    seq.innerHTML = (t.attackSeq as string[][])
+      .map(
+        (s, i) =>
+          `<div class="seq-item" data-s="${i}" style="--sev:${i}"><div class="seq-rail"><span class="seq-n">${String(i + 1).padStart(2, '0')}</span><span class="seq-line"></span></div><div class="seq-body"><div class="seq-stage">${esc(s[0])}</div><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p><div class="seq-dmg"><span class="seq-dmg-k">${esc(t.seqDamage)}</span>${esc(s[3])}</div></div></div>`,
+      )
+      .join('');
+
   renderVerdict();
   renderStatus();
   restartHow();
+  restartSeq();
 }
 
 function renderStatus(): void {
@@ -194,6 +206,31 @@ function restartHow(): void {
   }
   cycleHow();
   howTimer = setInterval(cycleHow, 2600);
+}
+
+function cycleSeq(): void {
+  const items = document.querySelectorAll<HTMLElement>('#seq .seq-item');
+  if (!items.length) return;
+  // seqIdx runs 0..length; at === length the whole chain shows "done", then resets.
+  items.forEach((it, i) => {
+    it.classList.toggle('active', i === seqIdx);
+    it.classList.toggle('done', i < seqIdx);
+  });
+  seqIdx = seqIdx >= items.length ? 0 : seqIdx + 1;
+}
+function restartSeq(): void {
+  if (seqTimer) {
+    clearInterval(seqTimer);
+    seqTimer = null;
+  }
+  seqIdx = 0;
+  const items = document.querySelectorAll<HTMLElement>('#seq .seq-item');
+  if (reduce) {
+    items.forEach((it) => it.classList.add('active', 'done'));
+    return;
+  }
+  cycleSeq();
+  seqTimer = setInterval(cycleSeq, 2100);
 }
 
 export function init(): void {

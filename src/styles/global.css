@@ -460,6 +460,92 @@ strong {
 .pm-quip b {
   color: var(--live-d);
 }
+.pm-xlogo {
+  margin-left: auto;
+  color: var(--ink-2);
+}
+/* recreated X post (citation, links to the real source) */
+.xcard {
+  background: var(--bg-3);
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  padding: clamp(18px, 3vw, 24px);
+  max-width: 660px;
+}
+.xcard-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  row-gap: 10px;
+  flex-wrap: wrap;
+}
+.xcard-av {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--f-disp);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--ink);
+  background: linear-gradient(135deg, #263041, #171b24);
+  border: 1px solid var(--line-2);
+  flex: none;
+}
+.xcard-id {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+.xcard-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.xcard-check {
+  color: var(--data);
+  flex: none;
+}
+.xcard-handle {
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+.xcard-src {
+  margin-left: auto;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--data);
+  text-decoration: none;
+  border: 1px solid var(--line-2);
+  border-radius: 100px;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+.xcard-src:hover {
+  border-color: var(--data);
+}
+.xcard-text {
+  margin-top: 15px;
+  color: var(--ink);
+  font-size: clamp(1rem, 2.2vw, 1.12rem);
+  line-height: 1.6;
+}
+.xcard-foot {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.xcard-views {
+  color: var(--ink-2);
+  font-weight: 600;
+}
 
 /* WHY */
 .why {
@@ -922,6 +1008,115 @@ footer .sig {
   font-family: var(--f-mono);
   font-size: 12px;
   color: var(--ink-3);
+}
+
+/* ATTACK SEQUENCE — escalating kill chain, auto-advancing */
+.seq {
+  display: grid;
+  gap: 0;
+}
+.seq-item {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 20px;
+  padding-bottom: 28px;
+  --accent: color-mix(in oklab, var(--warn), var(--live) calc(var(--sev) * 22%));
+}
+.seq-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.seq-n {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: #0a0c11;
+  background: var(--accent);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+}
+.seq-line {
+  flex: 1;
+  width: 2px;
+  background: var(--line-2);
+  margin-top: 6px;
+  position: relative;
+  min-height: 24px;
+}
+.seq-line::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 0;
+  background: var(--accent);
+  transition: height 0.5s ease;
+}
+.seq-item:last-child .seq-line {
+  display: none;
+}
+.seq-stage {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.seq-body h3 {
+  font-family: var(--f-disp);
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
+  font-weight: 800;
+  margin: 8px 0;
+  letter-spacing: -0.01em;
+  transition: color 0.3s;
+}
+.seq-body > p {
+  color: var(--ink-2);
+  font-size: 0.96rem;
+  max-width: 68ch;
+}
+.seq-dmg {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+  color: var(--live-d);
+  background: rgba(255, 107, 61, 0.08);
+  border: 1px solid rgba(255, 107, 61, 0.25);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.seq-dmg-k {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.seq-item.done .seq-line::after {
+  height: 100%;
+}
+.seq-item.active .seq-n {
+  transform: scale(1.14);
+  box-shadow:
+    0 0 0 5px color-mix(in oklab, var(--accent) 28%, transparent),
+    0 0 18px -2px var(--accent);
+}
+.seq-item.active .seq-line::after {
+  height: 100%;
+}
+.seq-item.active .seq-body h3 {
+  color: var(--accent);
 }
 
 @media (max-width: 860px) {
