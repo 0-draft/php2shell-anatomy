@@ -1045,7 +1045,80 @@ footer .sig {
 /* ATTACK SEQUENCE — cinematic playback: network map + attacker terminal + threat meter */
 .atk {
   display: grid;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+.atk-stage {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 28px);
+  display: grid;
+  gap: 12px;
+}
+.atk-flow {
+  display: grid;
+}
+.atk-step {
+  min-height: 64vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0.3;
+  transform: translateY(6px);
+  transition:
+    opacity 0.35s var(--ease),
+    transform 0.35s var(--ease);
+}
+.atk-step.active {
+  opacity: 1;
+  transform: none;
+}
+.atk-step-n {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+}
+.atk-step .cst {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--live);
+  margin-top: 8px;
+}
+.atk-step h3 {
+  font-family: var(--f-disp);
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-weight: 800;
+  margin: 10px 0;
+  letter-spacing: -0.02em;
+}
+.atk-step > p {
+  color: var(--ink-2);
+  font-size: 1rem;
+  max-width: 48ch;
+}
+.atk-step .cdmg {
+  margin-top: 16px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+  color: var(--live-d);
+  background: rgba(255, 107, 61, 0.08);
+  border: 1px solid rgba(255, 107, 61, 0.25);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.atk-step .cdmg-k {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .atk-map {
   display: flex;
@@ -1054,17 +1127,17 @@ footer .sig {
   background: var(--bg-2);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 18px 16px;
+  padding: 16px 14px;
   overflow-x: auto;
 }
 .atk-node {
   flex: 1 1 0;
-  min-width: 100px;
+  min-width: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 14px 8px;
+  gap: 7px;
+  padding: 12px 6px;
   border: 1px solid var(--line-2);
   border-radius: 10px;
   background: var(--bg-3);
@@ -1217,8 +1290,8 @@ footer .sig {
   font-family: var(--f-mono);
   font-size: 12.5px;
   line-height: 1.7;
-  min-height: 196px;
-  max-height: 248px;
+  min-height: 150px;
+  max-height: 200px;
   overflow-y: auto;
 }
 .atk-term .l {
@@ -1364,8 +1437,20 @@ footer .sig {
   .defs,
   .how,
   .exp-controls,
-  .atk-panel {
+  .atk {
     grid-template-columns: 1fr;
+  }
+  .atk {
+    gap: 22px;
+  }
+  .atk-stage {
+    position: static;
+  }
+  .atk-step {
+    min-height: auto;
+    padding: 26px 0;
+    opacity: 1;
+    transform: none;
   }
   .hero-stats {
     grid-template-columns: repeat(2, 1fr);
@@ -1390,6 +1475,10 @@ footer .sig {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+  .atk-step {
+    opacity: 1;
+    transform: none;
   }
 }
 :focus-visible {

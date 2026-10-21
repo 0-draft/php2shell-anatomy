@@ -49,7 +49,6 @@ const ATK_STATUS: Record<string, string> = {
 let atkStage = 0;
 let atkLinesStage = -1; // how many stages of terminal lines are currently painted
 let atkPlaying = false;
-let atkStarted = false; // autoplay-once guard
 let atkStepTimer: ReturnType<typeof setTimeout> | null = null;
 
 const reduce =
@@ -229,7 +228,6 @@ function atkNodeStatus(node: string, cls: string | undefined): string {
 }
 
 function paintAtkMeta(stage: number): void {
-  const t = d();
   const pad = (n: number) => String(n).padStart(2, '0');
   const stageNo = byId('atkStageNo');
   if (stageNo) stageNo.textContent = `${pad(stage + 1)} / 06`;
@@ -254,13 +252,9 @@ function paintAtkMeta(stage: number): void {
     el.classList.toggle('hot', i < hot);
   });
 
-  const cap = byId('atkCaption');
-  if (cap) {
-    const s = (t.attackSeq as string[][])[stage];
-    cap.innerHTML =
-      `<div class="cst">${esc(s[0])}</div><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p>` +
-      `<div class="cdmg"><span class="cdmg-k">${esc(t.seqDamage)}</span>${esc(s[3])}</div>`;
-  }
+  document.querySelectorAll<HTMLElement>('#atkFlow .atk-step').forEach((el, i) => {
+    el.classList.toggle('active', i === stage);
+  });
 
   document.querySelectorAll<HTMLElement>('#atkPips button').forEach((el, i) => {
     el.classList.toggle('done', i < stage);
@@ -326,17 +320,21 @@ function stopAtk(): void {
   atkPlaying = false;
 }
 
-function atkStep(): void {
-  atkStepTimer = setTimeout(() => {
-    if (atkStage >= ATK_LAST) {
-      atkPlaying = false;
-      updateAtkPlayBtn();
-      return;
-    }
-    setAtkStage(atkStage + 1, true);
+function scrollToStep(i: number): void {
+  const steps = document.querySelectorAll<HTMLElement>('#atkFlow .atk-step');
+  steps[i]?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+}
+
+// Play = an auto-tour that scrolls the narrative; the observer drives the instrument.
+function playTick(i: number): void {
+  const steps = document.querySelectorAll<HTMLElement>('#atkFlow .atk-step');
+  if (i >= steps.length) {
+    atkPlaying = false;
     updateAtkPlayBtn();
-    atkStep();
-  }, 2200);
+    return;
+  }
+  scrollToStep(i);
+  atkStepTimer = setTimeout(() => playTick(i + 1), 2400);
 }
 
 function playAtk(): void {
@@ -346,13 +344,27 @@ function playAtk(): void {
     return;
   }
   if (atkPlaying) return;
-  if (atkStage >= ATK_LAST && atkLinesStage >= ATK_LAST) {
-    atkLinesStage = -1;
-    setAtkStage(0, true);
-  }
   atkPlaying = true;
   updateAtkPlayBtn();
-  atkStep();
+  playTick(0);
+}
+
+let atkObserver: IntersectionObserver | null = null;
+function setupAtkObserver(): void {
+  if (atkObserver) atkObserver.disconnect();
+  if (reduce || !('IntersectionObserver' in window)) return;
+  const obs = new IntersectionObserver(
+    (entries) => {
+      for (const en of entries) {
+        if (!en.isIntersecting) continue;
+        const i = Number((en.target as HTMLElement).getAttribute('data-step'));
+        if (!Number.isNaN(i) && i !== atkStage) setAtkStage(i, true);
+      }
+    },
+    { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+  );
+  document.querySelectorAll<HTMLElement>('#atkFlow .atk-step').forEach((el) => obs.observe(el));
+  atkObserver = obs;
 }
 
 function renderAtk(): void {
@@ -363,6 +375,14 @@ function renderAtk(): void {
     const nl = el.querySelector<HTMLElement>('.atk-nl');
     if (nl && nodes[node]) nl.textContent = nodes[node];
   });
+  const flow = byId('atkFlow');
+  if (flow)
+    flow.innerHTML = (t.attackSeq as string[][])
+      .map(
+        (s, i) =>
+          `<div class="atk-step${i === atkStage ? ' active' : ''}" data-step="${i}"><div class="atk-step-n">${String(i + 1).padStart(2, '0')}</div><div class="cst">${esc(s[0])}</div><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p><div class="cdmg"><span class="cdmg-k">${esc(t.seqDamage)}</span>${esc(s[3])}</div></div>`,
+      )
+      .join('');
   const pips = byId('atkPips');
   if (pips && !pips.children.length) {
     pips.innerHTML = (t.attackSeq as string[][])
@@ -373,6 +393,7 @@ function renderAtk(): void {
   atkLinesStage = -1;
   setAtkStage(reduce ? ATK_LAST : atkStage, false);
   updateAtkPlayBtn();
+  setupAtkObserver();
 }
 
 export function init(): void {
@@ -403,7 +424,6 @@ export function init(): void {
   const atkPlay = byId('atkPlay');
   if (atkPlay)
     atkPlay.addEventListener('click', () => {
-      atkStarted = true;
       if (atkPlaying) {
         stopAtk();
         updateAtkPlayBtn();
@@ -416,27 +436,10 @@ export function init(): void {
     atkPips.addEventListener('click', (e) => {
       const b = (e.target as HTMLElement).closest('button');
       if (!b) return;
-      atkStarted = true;
       stopAtk();
-      setAtkStage(Number(b.getAttribute('data-p')), false);
       updateAtkPlayBtn();
+      scrollToStep(Number(b.getAttribute('data-p')));
     });
-  const atk = byId('atk');
-  if (atk && 'IntersectionObserver' in window && !reduce) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const en of entries) {
-          if (en.isIntersecting && !atkStarted) {
-            atkStarted = true;
-            playAtk();
-            io.disconnect();
-          }
-        }
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(atk);
-  }
 
   const rail = document.querySelector<HTMLElement>('.rail');
   const onScroll = () => {
