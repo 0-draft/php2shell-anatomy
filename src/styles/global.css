@@ -480,6 +480,8 @@ strong {
   flex-wrap: wrap;
 }
 .xcard-av {
+  position: relative;
+  overflow: hidden;
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -492,6 +494,14 @@ strong {
   background: linear-gradient(135deg, #263041, #171b24);
   border: 1px solid var(--line-2);
   flex: none;
+}
+.xcard-avimg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
 }
 .xcard-id {
   display: flex;

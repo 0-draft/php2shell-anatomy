@@ -63,7 +63,7 @@ function render(): void {
     why.innerHTML = (t.why as string[][])
       .map(
         (c) =>
-          `<div class="why-card"><div class="ic">${esc(c[0])}</div><h3>${c[1]}</h3><p>${c[2]}</p></div>`,
+          `<div class="why-card"><div class="ic">${esc(c[0])}</div><h3>${esc(c[1])}</h3><p>${c[2]}</p></div>`,
       )
       .join('');
 
@@ -72,7 +72,7 @@ function render(): void {
     how.innerHTML = (t.how as string[][])
       .map(
         (c, i) =>
-          `<div class="hcard" data-h="${i}"><span class="bar"></span><div class="ph">${esc(c[0])}</div><h3>${c[1]}</h3><p>${c[2]}</p></div>`,
+          `<div class="hcard" data-h="${i}"><span class="bar"></span><div class="ph">${esc(c[0])}</div><h3>${esc(c[1])}</h3><p>${c[2]}</p></div>`,
       )
       .join('');
 
@@ -122,7 +122,7 @@ function render(): void {
     defs.innerHTML = (t.def as [string, string, string, string, boolean][])
       .map(
         (c) =>
-          `<div class="def${c[4] ? ' primary' : ''}">${c[2] ? `<span class="star">${esc(c[2])}</span>` : ''}<div class="n">${esc(c[0])}</div><h3>${c[1]}</h3><p>${c[3]}</p></div>`,
+          `<div class="def${c[4] ? ' primary' : ''}">${c[2] ? `<span class="star">${esc(c[2])}</span>` : ''}<div class="n">${esc(c[0])}</div><h3>${esc(c[1])}</h3><p>${c[3]}</p></div>`,
       )
       .join('');
 

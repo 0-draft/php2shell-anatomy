@@ -5,6 +5,9 @@ import '../styles/global.css';
 const en = content.en;
 const base = import.meta.env.BASE_URL;
 const fav = `${base}${base.endsWith('/') ? '' : '/'}favicon.svg`;
+// Optional: drop a real avatar at public/pm-avatar.jpg and it is used automatically;
+// if the file is absent the monogram shows instead (onerror removes the <img>).
+const avatar = `${base}${base.endsWith('/') ? '' : '/'}pm-avatar.jpg`;
 const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
 ---
 
@@ -112,8 +115,11 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
 
           <article class="xcard">
             <header class="xcard-top">
-              <div class="xcard-av" data-i="pmMonogram" aria-hidden="true">
-                {en.pmMonogram}
+              <div class="xcard-av" aria-hidden="true">
+                <img class="xcard-avimg" src={avatar} alt="" onerror="this.remove()" />
+                <span class="xcard-avm" data-i="pmMonogram">
+                  {en.pmMonogram}
+                </span>
               </div>
               <div class="xcard-id">
                 <div class="xcard-name">

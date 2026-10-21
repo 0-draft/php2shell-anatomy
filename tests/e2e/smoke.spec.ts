@@ -11,11 +11,13 @@ test('renders the page with live status and no app errors', async ({ page }) => 
     if (/fonts\.g|favicon|net::ERR/i.test(text)) return;
     errors.push(text);
   });
+  page.on('pageerror', (e) => errors.push(e.message));
 
   await page.goto(PATH);
   await expect(page).toHaveTitle(/php2shell/i);
   await expect(page.locator('h1')).not.toBeEmpty();
-  await expect(page.locator('#statusBig')).not.toHaveText('—');
+  // '…' is the build-time placeholder; renderStatus() must replace it.
+  await expect(page.locator('#statusBig')).not.toHaveText('…');
   await expect(page.locator('#expVerdict h3')).not.toBeEmpty();
   // every plate renders its cards
   await expect(page.locator('#whyCards .why-card')).toHaveCount(4);
