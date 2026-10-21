@@ -68,6 +68,22 @@ const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
         <h1 data-i="h1" set:html={en.h1} />
         <p class="hero-sub" data-i="sub" set:html={en.sub} />
 
+        <div class="lineage">
+          <span class="lineage-k" data-i="lineageK">
+            {en.lineageK}
+          </span>
+          <span class="lineage-track">
+            {en.lineage.map((l: string[], i: number) => (
+              <>
+                {i > 0 && <span class="sep">›</span>}
+                <span class={`lin${i === en.lineage.length - 1 ? ' now' : ''}`}>
+                  {l[0]} <small>{l[1]}</small>
+                </span>
+              </>
+            ))}
+          </span>
+        </div>
+
         <div class="status">
           <div class="status-head">
             <span class="t" data-i="statusHead">

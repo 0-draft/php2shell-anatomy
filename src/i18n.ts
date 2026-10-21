@@ -26,6 +26,14 @@ export const content: Record<Lang, Record<string, any>> = {
       'The fix is out. Sansec expects <b>mass exploitation within ~15 minutes</b> of release, because diffing the patch reveals the bug. Every unpatched PHP server is now a target. Update immediately.',
     liveTag: 'live',
 
+    lineageK: 'Lineage',
+    lineage: [
+      ['Heartbleed', '2014'],
+      ['Shellshock', '2014'],
+      ['Log4Shell', '2021'],
+      ['php2shell', '2026'],
+    ],
+
     pmKicker: 'URGENT BROADCAST',
     pmTitle: 'Even the Prime Minister told you to patch tonight.',
     pmName: 'Sanae Takaichi',
@@ -366,6 +374,14 @@ export const content: Record<Lang, Record<string, any>> = {
     postNote:
       '修正は出た。Sansecは公開から<b>約15分で大規模悪用</b>が始まると予測している。パッチ差分から穴の場所が割れるからだ。未適用のPHPサーバーは全て標的。直ちに更新を。',
     liveTag: 'live',
+
+    lineageK: '系譜',
+    lineage: [
+      ['Heartbleed', '2014'],
+      ['Shellshock', '2014'],
+      ['Log4Shell', '2021'],
+      ['php2shell', '2026'],
+    ],
 
     pmKicker: '緊急放送',
     pmTitle: '首相まで「今夜パッチ当てて」と言ってくる脆弱性。',
