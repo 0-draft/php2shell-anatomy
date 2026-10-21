@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+test-results/
+playwright-report/
+.playwright-mcp/
+*.log
+.DS_Store
+.legacy-index.html.bak
+p2s-full.png
+.claude/

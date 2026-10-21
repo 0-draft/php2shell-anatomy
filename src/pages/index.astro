@@ -1,0 +1,349 @@
+---
+import { content } from '../i18n';
+import '../styles/global.css';
+
+const en = content.en;
+const base = import.meta.env.BASE_URL;
+const fav = `${base}${base.endsWith('/') ? '' : '/'}favicon.svg`;
+const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>php2shell Anatomy</title>
+    <link rel="icon" href={fav} type="image/svg+xml" />
+    <meta name="theme-color" content="#0A0C11" />
+    <meta
+      name="description"
+      content="A defensive awareness page dissecting the php2shell PHP zero-day (CVE-2026-109618 / CVE-2026-109619): why it's critical, who's affected, and how to patch in time."
+    />
+    <meta property="og:title" content="php2shell Anatomy" />
+    <meta
+      property="og:description"
+      content="One plain POST, and PHP is theirs. A defensive dissection of the php2shell zero-day — patch before it reaches you."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700;800&display=swap"
+    />
+  </head>
+  <body>
+    <div class="signal-top"></div>
+    <div class="rail"></div>
+
+    <div class="wrap">
+      <header class="hero">
+        <div class="hero-bar">
+          <span class="brand">
+            <b>php2shell</b> / anatomy{' '}
+            <span class="zeroday" data-i="badge">
+              {en.badge}
+            </span>
+          </span>
+          <button
+            type="button"
+            class="langtog"
+            id="langTog"
+            aria-label="Switch language / 言語切り替え"
+          >
+            {en._label}
+          </button>
+        </div>
+        <div class="cve-row">
+          <span class="cve">CVE-2026-109618</span>
+          <span class="cve">CVE-2026-109619</span>
+          <span class="cve" data-i="crit">
+            {en.crit}
+          </span>
+        </div>
+        <h1 data-i="h1" set:html={en.h1} />
+        <p class="hero-sub" data-i="sub" set:html={en.sub} />
+
+        <div class="status">
+          <div class="status-head">
+            <span class="t" data-i="statusHead">
+              {en.statusHead}
+            </span>
+            <span class="pill pre" id="statusPill">
+              {en.liveTag}
+            </span>
+          </div>
+          <div class="status-body">
+            <div class="status-big" id="statusBig">
+              —
+            </div>
+            <p class="status-note" id="statusNote" set:html={en.preNote} />
+          </div>
+          <div class="hero-stats" id="heroStats">
+            {en.stats.map((s: string[]) => (
+              <div class="hstat">
+                <div class={`v ${s[2] === 'cool' ? 'cool' : ''}`}>{s[0]}</div>
+                <div class="k">
+                  {s[1]}
+                  {s[2] && s[2] !== 'cool' ? ` ${s[2]}` : ''}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <!-- PM ALERT -->
+      <section class="pm" id="pm">
+        <div class="pm-head">
+          <span class="pm-kicker" data-i="pmKicker">
+            {en.pmKicker}
+          </span>
+          <span class="pm-trend">x.com · 2026-10-21</span>
+        </div>
+        <div class="pm-body">
+          <h2 data-i="pmTitle">{en.pmTitle}</h2>
+          <blockquote class="pm-quote" data-i="pmQuote">
+            {en.pmQuote}
+          </blockquote>
+          <div class="pm-attrib">
+            <span class="check">◆</span>
+            <span data-i="pmAttrib">{en.pmAttrib}</span>
+            <a href={pmUrl} target="_blank" rel="noopener" data-i="pmSourceLabel">
+              {en.pmSourceLabel}
+            </a>
+          </div>
+          <p class="pm-quip" data-i="pmQuip" set:html={en.pmQuip} />
+        </div>
+      </section>
+
+      <!-- WHY -->
+      <section class="plate" id="why">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 01</span>
+          <span class="nm" data-i="nmWhy">
+            {en.nmWhy}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="whyH">
+          {en.whyH}
+        </h2>
+        <p class="lead" data-i="whyLead" set:html={en.whyLead} />
+        <div class="why mt" id="whyCards">
+          {en.why.map((c: string[]) => (
+            <div class="why-card">
+              <div class="ic">{c[0]}</div>
+              <h3>{c[1]}</h3>
+              <p set:html={c[2]} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- HOW -->
+      <section class="plate" id="how">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 02</span>
+          <span class="nm" data-i="nmHow">
+            {en.nmHow}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="howH">
+          {en.howH}
+        </h2>
+        <p class="lead" data-i="howLead" set:html={en.howLead} />
+        <span class="caution" data-i="howCaution">
+          {en.howCaution}
+        </span>
+        <div class="how mt" id="howCards">
+          {en.how.map((c: string[], i: number) => (
+            <div class="hcard" data-h={i}>
+              <span class="bar" />
+              <div class="ph">{c[0]}</div>
+              <h3>{c[1]}</h3>
+              <p set:html={c[2]} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- EXPOSURE -->
+      <section class="plate" id="exposure">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 03</span>
+          <span class="nm" data-i="nmExp">
+            {en.nmExp}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="expH">
+          {en.expH}
+        </h2>
+        <p class="lead" data-i="expLead">
+          {en.expLead}
+        </p>
+        <div class="exp mt">
+          <div class="exp-controls">
+            <div class="exp-field">
+              <label data-i="expQ1">{en.expQ1}</label>
+              <div class="exp-opts" id="expVer"></div>
+            </div>
+            <div class="exp-field">
+              <label data-i="expQ2">{en.expQ2}</label>
+              <div class="exp-opts" id="expWaf"></div>
+            </div>
+          </div>
+          <div class="exp-verdict" id="expVerdict"></div>
+        </div>
+      </section>
+
+      <!-- TIMELINE -->
+      <section class="plate" id="timeline">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 04</span>
+          <span class="nm" data-i="nmTl">
+            {en.nmTl}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="tlH">
+          {en.tlH}
+        </h2>
+        <p class="lead" data-i="tlLead">
+          {en.tlLead}
+        </p>
+        <div class="tl mt" id="tl">
+          {en.tl.map((it: [string, string, boolean, string, string]) => (
+            <div class={`tl-item${it[2] ? ' crit' : ''}`}>
+              <div class="when">
+                {it[0]}
+                <small>{it[1]}</small>
+              </div>
+              <div class="what">
+                <h3>{it[3]}</h3>
+                <p set:html={it[4]} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- BLAST RADIUS -->
+      <section class="plate" id="blast">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 05</span>
+          <span class="nm" data-i="nmMx">
+            {en.nmMx}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="mxH">
+          {en.mxH}
+        </h2>
+        <p class="lead" data-i="mxLead">
+          {en.mxLead}
+        </p>
+        <div class="matrix mt" id="matrix">
+          <div class="mrow head">
+            <span>{en.mxHead[0]}</span>
+            <span>{en.mxHead[1]}</span>
+            <span>{en.mxHead[2]}</span>
+          </div>
+          {en.mx.map((r: string[]) => (
+            <div class="mrow">
+              <span class="ver">{r[0]}</span>
+              <span class={`state ${r[1]}`}>{r[2]}</span>
+              <span class="note">{r[3]}</span>
+            </div>
+          ))}
+        </div>
+        <p class="lead mt" data-i="mxTargetsLead" style="margin-bottom:0">
+          {en.mxTargetsLead}
+        </p>
+        <div class="targets" id="targets">
+          {en.targets.map((x: string) => (
+            <span>{x}</span>
+          ))}
+        </div>
+      </section>
+
+      <!-- DEFENSE -->
+      <section class="plate" id="defense">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span class="no">Plate 06</span>
+          <span class="nm" data-i="nmDef">
+            {en.nmDef}
+          </span>
+        </div>
+        <h2 class="section-h" data-i="defH">
+          {en.defH}
+        </h2>
+        <p class="lead" data-i="defLead">
+          {en.defLead}
+        </p>
+        <div class="myth mt">
+          <span class="x" data-i="mythX">
+            {en.mythX}
+          </span>
+          <p data-i="mythP" set:html={en.mythP} />
+        </div>
+        <div class="defs" id="defs">
+          {en.def.map((c: [string, string, string, string, boolean]) => (
+            <div class={`def${c[4] ? ' primary' : ''}`}>
+              {c[2] ? <span class="star">{c[2]}</span> : null}
+              <div class="n">{c[0]}</div>
+              <h3>{c[1]}</h3>
+              <p set:html={c[3]} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <footer>
+        <p class="f-lead" data-i="footLead" set:html={en.footLead} />
+        <p class="disclaimer" data-i="footDisc">
+          {en.footDisc}
+        </p>
+        <div class="refs">
+          <a
+            href="https://thehackernews.com/2026/10/php2shell-what-actually-protects-you.html"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="rk">[THN]</span> php2shell — what actually protects you
+          </a>
+          <a
+            href="https://www.securityweek.com/php2shell-mass-exploitation-looms-for-leaked-critical-php-flaws/"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="rk">[SecurityWeek]</span> Mass exploitation looms for leaked PHP flaws
+          </a>
+          <a href="https://www.php.net/" target="_blank" rel="noopener">
+            <span class="rk">[php.net]</span> Official security release &amp; advisory
+          </a>
+          <a href="https://cert.europa.eu/" target="_blank" rel="noopener">
+            <span class="rk">[CERT-EU]</span> Security Advisory 2026-018
+          </a>
+          <a
+            href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="rk">[CISA]</span> Known Exploited Vulnerabilities catalog
+          </a>
+        </div>
+        <p class="sig">kt (https://github.com/kanywst)</p>
+      </footer>
+    </div>
+
+    <script>
+      import { init } from '../scripts/app';
+      init();
+    </script>
+  </body>
+</html>
