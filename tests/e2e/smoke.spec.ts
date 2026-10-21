@@ -36,6 +36,14 @@ test('language toggle switches English ↔ Japanese', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
 
+test('attack playback renders its instrument and steps', async ({ page }) => {
+  await page.goto(PATH);
+  await expect(page.locator('#atkMap .atk-node')).toHaveCount(5);
+  await expect(page.locator('#atkFlow .atk-step')).toHaveCount(6);
+  await expect(page.locator('#atkPips button')).toHaveCount(6);
+  await expect(page.locator('#atkTerm .l').first()).toBeVisible();
+});
+
 test('exposure check reacts to an end-of-life selection', async ({ page }) => {
   await page.goto(PATH);
   await page.locator('#expVer button', { hasText: /8\.1 or older/ }).click();
