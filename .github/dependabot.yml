@@ -7,6 +7,10 @@ updates:
     groups:
       dev-dependencies:
         patterns: ['*']
+    ignore:
+      # @astrojs/check peers on typescript ^5 || ^6; drop once it accepts 7.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: '/'
     schedule:
