@@ -124,16 +124,20 @@ function render(): void {
       )
       .join('');
 
-  const mx = byId('matrix');
-  if (mx)
-    mx.innerHTML =
-      `<div class="mrow head"><span>${esc(t.mxHead[0])}</span><span>${esc(t.mxHead[1])}</span><span>${esc(t.mxHead[2])}</span></div>` +
-      (t.mx as string[][])
+  const renderMatrix = (id: string, head: string[], rows: string[][]) => {
+    const el = byId(id);
+    if (!el) return;
+    el.innerHTML =
+      `<div class="mrow head"><span>${esc(head[0])}</span><span>${esc(head[1])}</span><span>${esc(head[2])}</span></div>` +
+      rows
         .map(
           (r) =>
             `<div class="mrow"><span class="ver">${esc(r[0])}</span><span class="state ${r[1]}">${esc(r[2])}</span><span class="note">${esc(r[3])}</span></div>`,
         )
         .join('');
+  };
+  renderMatrix('matrix', t.mxHead, t.mx);
+  renderMatrix('distroMatrix', t.dxHead, t.dx);
 
   const targets = byId('targets');
   if (targets)

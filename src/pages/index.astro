@@ -530,6 +530,23 @@ const pageUrl = `${siteBase}/`;
             </div>
           ))}
         </div>
+        <p class="lead mt" data-i="dxLead">
+          {en.dxLead}
+        </p>
+        <div class="matrix mt" id="distroMatrix">
+          <div class="mrow head">
+            <span>{en.dxHead[0]}</span>
+            <span>{en.dxHead[1]}</span>
+            <span>{en.dxHead[2]}</span>
+          </div>
+          {en.dx.map((r: string[]) => (
+            <div class="mrow">
+              <span class="ver">{r[0]}</span>
+              <span class={`state ${r[1]}`}>{r[2]}</span>
+              <span class="note">{r[3]}</span>
+            </div>
+          ))}
+        </div>
         <p class="lead mt" data-i="mxTargetsLead" style="margin-bottom:0">
           {en.mxTargetsLead}
         </p>
