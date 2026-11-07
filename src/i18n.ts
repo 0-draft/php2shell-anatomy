@@ -11,19 +11,19 @@ export const content: Record<Lang, Record<string, any>> = {
     crit: 'CVSS v4.0 9.2 · CRITICAL',
     h1: 'One plain POST,<br>and PHP is <span class="g">theirs</span>.',
     sub: 'No upload form. No login. A single ordinary HTTP&nbsp;POST is reported to run code on nearly <span class="hot">every server running PHP</span>. That is php2shell. This page exists so you patch before it reaches you.',
-    statusHead: 'patch status · 2026-10-21 14:00 UTC release',
+    statusHead: 'patch status · fixed 2026-10-21 · CISA KEV 2026-10-26',
     stats: [
       ['9.2', 'CVSS v4.0', ''],
-      ['unauth', 'no login required', '(reported)'],
+      ['unauth', 'no login required', ''],
       ['PHP 5.4+', 'claimed impact', 'cool'],
-      ['~15 min', 'patch-diff to mass exploit', 'cool'],
+      ['KEV', 'CISA: exploited in the wild', 'cool'],
     ],
     preBig: 'T− {t} to patch',
     preNote:
       'PHP ships an out-of-cycle security release at <b>14:00 UTC, 2026-10-21</b> for 8.2 / 8.3 / 8.4 / 8.5. Have your update staged now. The gap between patch and weaponisation is expected to be tiny.',
     postBig: 'PATCH IS LIVE · UPDATE NOW',
     postNote:
-      'The fix is out. Sansec expects <b>mass exploitation within ~15 minutes</b> of release, because diffing the patch reveals the bug. Every unpatched PHP server is now a target. Update immediately.',
+      'Fixed in <b>8.5.12 / 8.4.27 / 8.3.36 / 8.2.35</b> (2026-10-21). CISA added both CVEs to its <b>Known Exploited Vulnerabilities</b> catalog on 2026-10-26: this is being exploited in the wild. If you are below those versions, update now.',
     liveTag: 'live',
 
     lineageK: 'Lineage',
@@ -60,7 +60,7 @@ export const content: Record<Lang, Record<string, any>> = {
       [
         '02 · default on',
         'No special setup needed',
-        'The suspected code path, <code>session.upload_progress</code>, has been <b>on by default since PHP 5.4</b>. Nobody has to misconfigure anything for it to apply.',
+        'The demonstrated path for CVE-2026-109619, <code>session.upload_progress</code>, has been <b>on by default since PHP 5.4</b>. Nobody has to misconfigure anything for it to apply.',
       ],
       [
         '03 · unauthenticated',
@@ -79,18 +79,18 @@ export const content: Record<Lang, Record<string, any>> = {
     howLead:
       'You don’t need exploit details to grasp why this is bad. Here is the shape of it, at a level that informs defenders without handing anyone a weapon.',
     howCaution:
-      'Mechanism below is high-level and based on leaked info / researcher analysis. PHP has not published root-cause details (as of 2026-10-21). No reproduction steps are shown here.',
+      'Mechanism below is high-level, based on PHP’s own advisories (GHSA-w8hw-w9fx-j79w, GHSA-6wmf-4rv5-p3rp). They are two separate bugs. No reproduction steps are shown here.',
     how: [
       [
         'Reached through',
-        'PHP’s upload-progress handling',
-        'PHP has a built-in feature that reports how far an upload has got. The flaw is reported to sit in that code path, and it’s active by default, so ordinary requests can reach it.',
+        'Ordinary requests, default config',
+        'No login and no special feature. For CVE-2026-109619 the demonstrated route is PHP’s built-in upload-progress tracking, which is on by default, so an ordinary POST can reach it.',
         'entry',
       ],
       [
         'The bug class',
-        'A memory-safety flaw (use-after-free)',
-        'Internal bookkeeping is reported to reuse a piece of memory after it was already released. That “use-after-free” is the classic kind of bug that can be steered into running attacker code.',
+        'Two memory-safety flaws',
+        'CVE-2026-109618: an out-of-memory bailout fires while request memory is only half set up, and shutdown cleanup then touches the broken memory. CVE-2026-109619: a long-lived worker keeps internal state pointing at memory freed by an earlier failed request (use-after-free). Both can be steered into running attacker code.',
         'defect',
       ],
       [
@@ -200,8 +200,8 @@ export const content: Record<Lang, Record<string, any>> = {
       eol: [
         'crit',
         'Critical, and no patch is coming',
-        'Your branch is end-of-life. The 2026-10-21 release covers only 8.2 to 8.5, so <b>8.1, 8.0, 7.x and 5.x get no fix</b>. A WAF rule only buys time.',
-        'Upgrade to a supported, patched branch (8.2+) now. This is the single most urgent item on your list.',
+        'Your branch is end-of-life. PHP released fixes only for 8.2 to 8.5, so <b>8.1, 8.0, 7.x and 5.x get no official release</b>. Some vendors (Ubuntu, Ubuntu ESM, AlmaLinux, commercial LTS) ship backported packages, and php.net published source backports for 7.4 / 8.0 / 8.1, but that is a stopgap. A WAF rule only buys time.',
+        'If your OS vendor ships a fixed package for your branch, install it today. Then upgrade to a supported branch (8.3+, since 8.2 reaches end-of-life on 2026-12-31).',
       ],
       supportedPre: [
         'high',
@@ -212,8 +212,8 @@ export const content: Record<Lang, Record<string, any>> = {
       supportedPost: [
         'high',
         'High. The fix is out, apply it immediately.',
-        'Your branch (PHP {v}) has a fix as of 14:00 UTC 2026-10-21. Every unpatched minute counts: mass exploitation is expected within ~15 minutes of release.',
-        'Update to the latest {v}.x patch release right now, then confirm the running version. Keep edge filtering on until you’ve verified.',
+        'Your branch (PHP {v}) has had a fix since 2026-10-21. CISA lists both CVEs as exploited in the wild, so an unpatched server is a live target.',
+        'Update to the latest {v}.x release (or your distro’s fixed package) right now, restart PHP-FPM / the web server, then confirm the running version. Keep edge filtering on until you’ve verified.',
       ],
       guardPre: [
         'guard',
@@ -224,7 +224,7 @@ export const content: Record<Lang, Record<string, any>> = {
       guardPost: [
         'guard',
         'Shield up. Now finish the job.',
-        'Your edge filter helps, but the real fix shipped at 14:00 UTC. Relying on a WAF alone against a core RCE is a losing bet over time.',
+        'Your edge filter helps, but the real fix shipped on 2026-10-21. Attackers were already reworking payloads to slip past WAF rules, so relying on a WAF alone against a core RCE is a losing bet.',
         'Apply the official patch now, verify the running PHP version, and leave the filter in place as defence-in-depth.',
       ],
       unknown: [
@@ -259,29 +259,68 @@ export const content: Record<Lang, Record<string, any>> = {
         '+~15 min',
         true,
         'Weaponisation window',
-        'Sansec expects mass exploitation within minutes: comparing the patched code with the old reveals exactly where the bug was.',
+        'Sansec warned that diffing the patch could lead to mass exploitation within minutes. It later revised that to “less likely”; exploitation still came (see 10-26).',
       ],
       [
         '2026-10-22',
         'original date',
         false,
         'Planned disclosure',
-        'The coordinated disclosure date the leak jumped ahead of. Early exploitation attempts were already reported (e.g. by Cloudflare) before this.',
+        'The coordinated disclosure date the leak jumped ahead of. Cloudflare had already reported attack traffic against its customers on 10-21.',
+      ],
+      [
+        '2026-10-23',
+        'follow-up',
+        false,
+        'Third CVE noted',
+        'PHP flags CVE-2026-115560, a narrower upload-progress issue that also affects the patched releases, but only where an app switches <code>session.serialize_handler</code> to <code>php</code> at runtime. Full fix deferred to the next regular release.',
+      ],
+      [
+        '2026-10-26',
+        'CISA KEV',
+        true,
+        'Confirmed exploited',
+        'CISA adds CVE-2026-109618 and CVE-2026-109619 to the Known Exploited Vulnerabilities catalog, with a federal due date of 2026-10-29.',
       ],
     ],
 
     nmMx: 'Blast radius',
     mxH: 'Who gets a patch, and who doesn’t.',
     mxLead:
-      'Fixes land only for currently-supported branches. If you’re on anything older, there is no fix, only an upgrade.',
-    mxHead: ['PHP branch', 'Patch 2026-10-21', 'Action'],
+      'PHP released fixes only for currently-supported branches. Older branches get no official release; some OS vendors backport the fix, and an upgrade is still the way out.',
+    mxHead: ['PHP branch', 'Fixed in', 'Action'],
     mx: [
-      ['8.5', 'ok', 'Patched', 'Update to the latest 8.5 release'],
-      ['8.4', 'ok', 'Patched', 'Update to the latest 8.4 release'],
-      ['8.3', 'ok', 'Patched', 'Update to the latest 8.3 release'],
-      ['8.2', 'ok', 'Patched', 'Update to the latest 8.2 release'],
-      ['8.1', 'eol', 'No fix (EOL)', 'Upgrade to 8.2+ immediately'],
-      ['8.0 / 7.x / 5.x', 'eol', 'No fix (EOL)', 'Upgrade to a supported branch'],
+      ['8.5', 'ok', '8.5.12', 'Update to 8.5.12 or later'],
+      ['8.4', 'ok', '8.4.27', 'Update to 8.4.27 or later'],
+      ['8.3', 'ok', '8.3.36', 'Update to 8.3.36 or later'],
+      ['8.2', 'ok', '8.2.35', 'Update to 8.2.35+; 8.2 is EOL on 2026-12-31'],
+      ['8.1', 'eol', 'No release (EOL)', 'Vendor backport if you have one, then 8.3+'],
+      ['8.0 / 7.x / 5.x', 'eol', 'No release (EOL)', 'Vendor backport if you have one, then 8.3+'],
+    ],
+    dxLead:
+      'If PHP comes from your OS, the version number won’t match upstream: distros backport the fix. Install the fixed package for your release (checked 2026-11-07):',
+    dxHead: ['OS / image', 'Fixed package', 'Note'],
+    dx: [
+      ['Debian 13 trixie', 'ok', 'php8.4 8.4.27-1~deb13u1', 'DSA-6574-1'],
+      ['Debian 12 bookworm', 'ok', 'php8.2 8.2.35-1~deb12u1', 'DLA-4848-1'],
+      ['Ubuntu 26.04', 'ok', 'php8.5 8.5.4-0ubuntu1.5', 'USN-8948-1'],
+      ['Ubuntu 24.04', 'ok', 'php8.3 8.3.6-0ubuntu0.24.04.13', 'USN-8948-1'],
+      ['Ubuntu 22.04', 'ok', 'php8.1 8.1.2-1ubuntu2.28', 'USN-8948-1'],
+      ['Ubuntu 20.04 ESM', 'ok', 'php7.4 7.4.3-4ubuntu2.29+esm5', 'Ubuntu Pro required'],
+      ['AlmaLinux 8 / 9 / 10', 'ok', 'all php streams', 'Fixed 2026-10-21, incl. retired streams'],
+      ['RHEL 8 / 9 / 10', 'eol', 'rolling out', 'RHSB-2026-013: check the erratum for your stream'],
+      [
+        'Alpine 3.24 / edge',
+        'ok',
+        'php83 8.3.36 · php84 8.4.27 · php85 8.5.12',
+        'No fix listed for 3.20–3.23',
+      ],
+      [
+        'Docker php images',
+        'ok',
+        '8.5.12 · 8.4.27 · 8.3.36 · 8.2.35',
+        'Re-pull and rebuild your images',
+      ],
     ],
     mxTargetsLead: 'Reportedly demonstrated against, among others:',
     targets: [
@@ -308,7 +347,7 @@ export const content: Record<Lang, Record<string, any>> = {
         '01',
         'Patch to a fixed release',
         'Primary',
-        'Update to the 2026-10-21 release for your branch (8.2 / 8.3 / 8.4 / 8.5), then confirm with <code>php -v</code>. This is the only real cure.',
+        'Update to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 or later (or your distro’s fixed package), restart PHP-FPM / the web server, then confirm with <code>php -v</code>. PHP says there is no complete mitigation: this is the only real cure.',
         true,
       ],
       [
@@ -322,14 +361,14 @@ export const content: Record<Lang, Record<string, any>> = {
         '03',
         'Disable upload-progress tracking',
         '',
-        'If you can’t patch instantly, set <code>session.upload_progress.enabled=0</code> in php.ini, a targeted mitigation if the reported root cause holds. Re-test your apps.',
+        'Set <code>session.upload_progress.enabled=0</code> in php.ini or the FPM pool (not <code>ini_set()</code> or <code>.user.ini</code>) and restart every worker. PHP calls it partial: it blocks the demonstrated path of CVE-2026-109619, does nothing for CVE-2026-109618, and is the recommended stopgap for CVE-2026-115560 even on patched releases.',
         false,
       ],
       [
         '04',
         'Upgrade anything end-of-life',
         '',
-        '8.1, 8.0, 7.x and 5.x receive no fix. If you’re on them, an upgrade is the mitigation; there is no patch to wait for.',
+        '8.1, 8.0, 7.x and 5.x get no official PHP release. Take a vendor backport if one exists for you, then upgrade to 8.3+ (8.2 itself goes end-of-life on 2026-12-31).',
         false,
       ],
       [
@@ -351,7 +390,7 @@ export const content: Record<Lang, Record<string, any>> = {
     footLead:
       '<b>php2shell-anatomy</b> is an awareness page explaining a fresh PHP zero-day (CVE-2026-109618 / CVE-2026-109619) so people patch in time. Built for defenders.',
     footDisc:
-      'No exploit code, payloads or reproduction steps are included, by design. Technical claims are drawn from public reporting and may change once PHP publishes its official advisory. Verify against php.net before acting.',
+      'No exploit code, payloads or reproduction steps are included, by design. Technical claims are drawn from PHP’s advisories, CISA, distro security trackers and public reporting, last checked 2026-11-07. Verify against php.net and your vendor before acting.',
   },
 
   ja: {
@@ -360,19 +399,19 @@ export const content: Record<Lang, Record<string, any>> = {
     crit: 'CVSS v4.0 9.2 · 緊急',
     h1: 'ただのPOSTで、<br>PHPは<span class="g">奪われる</span>。',
     sub: 'アップロード欄も、ログインも要らない。何の変哲もないHTTP&nbsp;POST一発で、<span class="hot">PHPが動くほぼ全サーバー</span>でコードが走る、とされる。それが php2shell。手遅れになる前にパッチを当ててほしくて、このページを作った。',
-    statusHead: 'パッチ状況 · 2026-10-21 14:00 UTC リリース',
+    statusHead: 'パッチ状況 · 2026-10-21 修正 · CISA KEV 2026-10-26',
     stats: [
       ['9.2', 'CVSS v4.0', ''],
-      ['未認証', 'ログイン不要', '（とされる）'],
+      ['未認証', 'ログイン不要', ''],
       ['PHP 5.4+', '影響主張', 'cool'],
-      ['約15分', '差分から大規模悪用', 'cool'],
+      ['KEV', 'CISA: 実際に悪用', 'cool'],
     ],
     preBig: 'パッチまで T− {t}',
     preNote:
       'PHPは <b>2026-10-21 14:00 UTC</b> に 8.2 / 8.3 / 8.4 / 8.5 向けの緊急リリースを出す。更新準備は今のうちに。パッチ公開から武器化までの猶予はごく短いと見られている。',
     postBig: 'パッチ公開済み · 今すぐ更新を',
     postNote:
-      '修正は出た。Sansecは公開から<b>約15分で大規模悪用</b>が始まると予測している。パッチ差分から穴の場所が割れるからだ。未適用のPHPサーバーは全て標的。直ちに更新を。',
+      '修正版は <b>8.5.12 / 8.4.27 / 8.3.36 / 8.2.35</b>(2026-10-21)。CISAは 2026-10-26 に両CVEを <b>Known Exploited Vulnerabilities</b> カタログに追加した。実際に悪用されている。これより古い版なら、今すぐ更新を。',
     liveTag: 'live',
 
     lineageK: '系譜',
@@ -409,7 +448,7 @@ export const content: Record<Lang, Record<string, any>> = {
       [
         '02 · デフォルト有効',
         '特別な設定は要らない',
-        '疑われる経路 <code>session.upload_progress</code> は <b>PHP 5.4以降デフォルトで有効</b>。危険な設定をしていなくても成立しうる。',
+        'CVE-2026-109619 で実証された経路 <code>session.upload_progress</code> は <b>PHP 5.4以降デフォルトで有効</b>。危険な設定をしていなくても成立しうる。',
       ],
       [
         '03 · 未認証',
@@ -428,18 +467,18 @@ export const content: Record<Lang, Record<string, any>> = {
     howLead:
       '深刻さを理解するのに攻撃手順は要らない。防御側に役立つ範囲で、武器を渡さずに「形」だけ示す。',
     howCaution:
-      '以下の仕組みは高レベルの説明で、リーク情報・研究者分析に基づく。PHP公式は根本原因を未公表(2026-10-21時点)。再現手順は一切載せていない。',
+      '以下の仕組みは高レベルの説明で、PHP公式のアドバイザリ(GHSA-w8hw-w9fx-j79w / GHSA-6wmf-4rv5-p3rp)に基づく。2件は別々のバグ。再現手順は一切載せていない。',
     how: [
       [
         '届く経路',
-        'PHPのアップロード進捗処理',
-        'PHPにはアップロードの進み具合を報告する組み込み機能がある。穴はそのコード経路にあるとされ、デフォルト有効なので普通のリクエストでも届きうる。',
+        '普通のリクエスト、デフォルト設定',
+        'ログインも特別な機能も要らない。CVE-2026-109619 で実証された経路は、デフォルト有効の組み込み機能「アップロード進捗追跡」。だから普通のPOSTでも届きうる。',
         'entry',
       ],
       [
         'バグの種類',
-        'メモリ安全性の不具合(use-after-free)',
-        '内部処理が、いったん解放したメモリを再び使ってしまうと報じられている。この「解放後使用」は、攻撃者のコード実行へ誘導されうる典型的なバグ。',
+        'メモリ安全性の不具合が2件',
+        'CVE-2026-109618: リクエスト用メモリの準備が途中のままメモリ不足(OOM)で処理が打ち切られ、終了処理が壊れたメモリに触れる。CVE-2026-109619: 常駐ワーカーが、前の失敗したリクエストで解放済みのメモリを指す内部状態を持ち越して使う(use-after-free)。どちらも攻撃者のコード実行へ誘導されうる。',
         'defect',
       ],
       [
@@ -549,8 +588,8 @@ export const content: Record<Lang, Record<string, any>> = {
       eol: [
         'crit',
         '緊急。しかもパッチは来ない。',
-        'あなたのブランチはEOL。2026-10-21のリリースは 8.2〜8.5 のみで、<b>8.1・8.0・7.x・5.x には修正が出ない</b>。WAFルールは時間稼ぎにしかならない。',
-        'サポート対象(8.2+)へ今すぐアップグレードを。あなたのリストで最優先の項目。',
+        'あなたのブランチはEOL。PHP公式の修正は 8.2〜8.5 のみで、<b>8.1・8.0・7.x・5.x には公式リリースが出ない</b>。一部のベンダー(Ubuntu、Ubuntu ESM、AlmaLinux、商用LTS)はバックポート版を出しており、php.net も 7.4 / 8.0 / 8.1 向けのソースバックポートを公開したが、あくまで応急処置。WAFルールは時間稼ぎにしかならない。',
+        'OSベンダーが自分のブランチ向けの修正パッケージを出しているなら今日入れる。その上でサポート対象(8.3+。8.2 は 2026-12-31 にEOL)へアップグレードを。',
       ],
       supportedPre: [
         'high',
@@ -561,8 +600,8 @@ export const content: Record<Lang, Record<string, any>> = {
       supportedPost: [
         'high',
         '高。修正は出た。直ちに適用を。',
-        'あなたのブランチ(PHP {v})は 14:00 UTC 時点で修正済み。未適用の1分1分が致命的。公開から約15分で大規模悪用が見込まれる。',
-        '最新の {v}.x パッチへ今すぐ更新し、稼働版を確認。検証が済むまでエッジのフィルタは維持を。',
+        'あなたのブランチ(PHP {v})は 2026-10-21 から修正版がある。CISAは両CVEを実際に悪用されたものとして登録済み。未適用のサーバーは現役の標的。',
+        '最新の {v}.x(またはディストリの修正パッケージ)へ今すぐ更新し、PHP-FPM / Webサーバーを再起動して稼働版を確認。検証が済むまでエッジのフィルタは維持を。',
       ],
       guardPre: [
         'guard',
@@ -573,7 +612,7 @@ export const content: Record<Lang, Record<string, any>> = {
       guardPost: [
         'guard',
         '遮蔽あり。だが仕上げを。',
-        'エッジのフィルタは有効だが、本当の修正は 14:00 UTC に出た。コアRCEにWAF頼みは長期的に負ける賭け。',
+        'エッジのフィルタは有効だが、本当の修正は 2026-10-21 に出た。攻撃者はWAFルールを避けるようペイロードを作り替えていた。コアRCEにWAF頼みは負ける賭け。',
         '公式パッチを今すぐ適用し、稼働PHP版を検証。フィルタは多層防御として残す。',
       ],
       unknown: [
@@ -608,29 +647,78 @@ export const content: Record<Lang, Record<string, any>> = {
         '+約15分',
         true,
         '武器化の窓',
-        'Sansecは数分で大規模悪用が始まると予測。修正版と旧コードを比べれば穴の場所が割れる。',
+        'Sansecはパッチ差分から数分で大規模悪用が始まりうると警告した。のちに「可能性は低い」と修正したが、悪用自体は起きた(10-26 参照)。',
       ],
       [
         '2026-10-22',
         '本来の予定日',
         false,
         '予定されていた公開日',
-        'リークが先回りした協調ディスクロージャ日。これ以前に早期の悪用試行が既に報告されている(Cloudflare等)。',
+        'リークが先回りした協調ディスクロージャ日。Cloudflareは 10-21 の時点で顧客への攻撃トラフィックを報告していた。',
+      ],
+      [
+        '2026-10-23',
+        '追補',
+        false,
+        '3件目のCVE',
+        'PHPが CVE-2026-115560 を告知。アップロード進捗まわりのより狭い問題で、修正版にも残る。ただし影響するのは、アプリが実行時に <code>session.serialize_handler</code> を <code>php</code> へ切り替える場合だけ。修正は次の定例リリースに持ち越し。',
+      ],
+      [
+        '2026-10-26',
+        'CISA KEV',
+        true,
+        '悪用を確認',
+        'CISAが CVE-2026-109618 と CVE-2026-109619 を Known Exploited Vulnerabilities カタログに追加。米連邦機関の対応期限は 2026-10-29。',
       ],
     ],
 
     nmMx: '影響範囲',
     mxH: 'パッチが来る版、来ない版。',
     mxLead:
-      '修正はサポート中のブランチにしか出ない。それより古ければ修正は無く、残る道はアップグレードだけ。',
-    mxHead: ['PHPブランチ', '2026-10-21 パッチ', '取るべき行動'],
+      'PHP公式の修正はサポート中のブランチにしか出ない。古いブランチに公式リリースは無い。一部のOSベンダーはバックポートしているが、根本的な解決はアップグレードだけ。',
+    mxHead: ['PHPブランチ', '修正版', '取るべき行動'],
     mx: [
-      ['8.5', 'ok', '修正あり', '最新の 8.5 リリースへ更新'],
-      ['8.4', 'ok', '修正あり', '最新の 8.4 リリースへ更新'],
-      ['8.3', 'ok', '修正あり', '最新の 8.3 リリースへ更新'],
-      ['8.2', 'ok', '修正あり', '最新の 8.2 リリースへ更新'],
-      ['8.1', 'eol', '修正なし(EOL)', '今すぐ 8.2+ へアップグレード'],
-      ['8.0 / 7.x / 5.x', 'eol', '修正なし(EOL)', 'サポート対象ブランチへ移行'],
+      ['8.5', 'ok', '8.5.12', '8.5.12 以降へ更新'],
+      ['8.4', 'ok', '8.4.27', '8.4.27 以降へ更新'],
+      ['8.3', 'ok', '8.3.36', '8.3.36 以降へ更新'],
+      ['8.2', 'ok', '8.2.35', '8.2.35 以降へ。8.2 は 2026-12-31 にEOL'],
+      ['8.1', 'eol', '公式版なし(EOL)', 'ベンダーのバックポートがあれば適用、その上で 8.3+ へ'],
+      [
+        '8.0 / 7.x / 5.x',
+        'eol',
+        '公式版なし(EOL)',
+        'ベンダーのバックポートがあれば適用、その上で 8.3+ へ',
+      ],
+    ],
+    dxLead:
+      'OS付属のPHPなら、版番号は公式と一致しない(ディストリが修正をバックポートしている)。自分のリリースの修正パッケージを入れる(2026-11-07 確認):',
+    dxHead: ['OS / イメージ', '修正パッケージ', '備考'],
+    dx: [
+      ['Debian 13 trixie', 'ok', 'php8.4 8.4.27-1~deb13u1', 'DSA-6574-1'],
+      ['Debian 12 bookworm', 'ok', 'php8.2 8.2.35-1~deb12u1', 'DLA-4848-1'],
+      ['Ubuntu 26.04', 'ok', 'php8.5 8.5.4-0ubuntu1.5', 'USN-8948-1'],
+      ['Ubuntu 24.04', 'ok', 'php8.3 8.3.6-0ubuntu0.24.04.13', 'USN-8948-1'],
+      ['Ubuntu 22.04', 'ok', 'php8.1 8.1.2-1ubuntu2.28', 'USN-8948-1'],
+      ['Ubuntu 20.04 ESM', 'ok', 'php7.4 7.4.3-4ubuntu2.29+esm5', 'Ubuntu Pro が必要'],
+      [
+        'AlmaLinux 8 / 9 / 10',
+        'ok',
+        '全 php ストリーム',
+        '2026-10-21 修正。サポート終了ストリームも含む',
+      ],
+      ['RHEL 8 / 9 / 10', 'eol', '順次提供中', 'RHSB-2026-013: 自分のストリームの erratum を確認'],
+      [
+        'Alpine 3.24 / edge',
+        'ok',
+        'php83 8.3.36 · php84 8.4.27 · php85 8.5.12',
+        '3.20〜3.23 は修正の掲載なし',
+      ],
+      [
+        'Docker php イメージ',
+        'ok',
+        '8.5.12 · 8.4.27 · 8.3.36 · 8.2.35',
+        'pull し直してイメージを再ビルド',
+      ],
     ],
     mxTargetsLead: 'とりわけ、以下などで実証されたと報じられている。',
     targets: [
@@ -657,7 +745,7 @@ export const content: Record<Lang, Record<string, any>> = {
         '01',
         '修正版へパッチ',
         '最優先',
-        '自分のブランチ(8.2 / 8.3 / 8.4 / 8.5)の 2026-10-21 リリースへ更新し、<code>php -v</code> で確認。唯一の本当の治療。',
+        '8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 以降(またはディストリの修正パッケージ)へ更新し、PHP-FPM / Webサーバーを再起動して <code>php -v</code> で確認。PHP公式も「完全な緩和策は無い」としている。唯一の本当の治療。',
         true,
       ],
       [
@@ -671,14 +759,14 @@ export const content: Record<Lang, Record<string, any>> = {
         '03',
         'アップロード進捗追跡を無効化',
         '',
-        '即時パッチが無理なら php.ini で <code>session.upload_progress.enabled=0</code>。報じられた根本原因が正しければ的を絞った緩和になる。アプリを再テスト。',
+        'php.ini か FPM プールで <code>session.upload_progress.enabled=0</code>(<code>ini_set()</code> や <code>.user.ini</code> では効かない)にし、全ワーカーを再起動。PHP公式の位置づけは部分的な緩和。CVE-2026-109619 の実証経路は塞ぐが CVE-2026-109618 には効かない。修正版でも、CVE-2026-115560 への推奨暫定策になっている。',
         false,
       ],
       [
         '04',
         'EOL版は上げる',
         '',
-        '8.1・8.0・7.x・5.x には修正が出ない。使っているならアップグレードが唯一の緩和。待つべきパッチが無い。',
+        '8.1・8.0・7.x・5.x にPHP公式のリリースは出ない。使えるベンダーのバックポートがあれば入れ、その上で 8.3+ へ(8.2 自体も 2026-12-31 にEOL)。',
         false,
       ],
       [
@@ -700,6 +788,6 @@ export const content: Record<Lang, Record<string, any>> = {
     footLead:
       '<b>php2shell-anatomy</b> は、新しいPHPのゼロデイ(CVE-2026-109618 / CVE-2026-109619)を手遅れになる前に塞いでもらうための注意喚起ページ。防御側のために作った。',
     footDisc:
-      '攻撃コード・ペイロード・再現手順は意図的に一切含めていない。技術的記述は公開報道に基づき、PHP公式アドバイザリ公開後に変わりうる。対応前に php.net で確認を。',
+      '攻撃コード・ペイロード・再現手順は意図的に一切含めていない。技術的記述は PHP公式アドバイザリ、CISA、各ディストリのセキュリティトラッカー、公開報道に基づく(最終確認 2026-11-07)。対応前に php.net と各ベンダーで確認を。',
   },
 };

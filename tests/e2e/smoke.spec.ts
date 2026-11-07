@@ -23,6 +23,9 @@ test('renders the page with live status and no app errors', async ({ page }) => 
   // every plate renders its cards
   await expect(page.locator('#whyCards .why-card')).toHaveCount(4);
   await expect(page.locator('#defs .def')).toHaveCount(6);
+  await expect(page.locator('#matrix .mrow:not(.head)')).toHaveCount(6);
+  await expect(page.locator('#distroMatrix .mrow:not(.head)')).toHaveCount(10);
+  await expect(page.locator('#tl .tl-item')).toHaveCount(6);
   expect(errors).toEqual([]);
 });
 
@@ -32,6 +35,7 @@ test('language toggle switches English ↔ Japanese', async ({ page }) => {
   await page.locator('#langTog').click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
   await expect(page.locator('h1')).toContainText('PHP');
+  await expect(page.locator('#distroMatrix .mrow.head')).toContainText('修正パッケージ');
   await page.locator('#langTog').click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
