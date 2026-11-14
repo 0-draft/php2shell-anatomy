@@ -5,9 +5,8 @@ import '../styles/global.css';
 const en = content.en;
 const base = import.meta.env.BASE_URL;
 const fav = `${base}${base.endsWith('/') ? '' : '/'}favicon.svg`;
-// Optional: drop a real avatar at public/pm-avatar.jpg and it is used automatically;
-// if the file is absent the monogram shows instead (onerror removes the <img>).
-const avatar = `${base}${base.endsWith('/') ? '' : '/'}pm-avatar.jpg`;
+// The quoted post. Existence checked against search indexing of this URL and
+// news coverage quoting it (ITmedia via Infoseek, livedoor), 2026-11-15.
 const pmUrl = 'https://x.com/takaichi_sanae/status/2112890642590564386';
 const siteBase = new URL(base, Astro.site ?? 'https://0-draft.github.io').href.replace(/\/$/, '');
 const ogImage = `${siteBase}/og.png`;
@@ -133,56 +132,17 @@ const pageUrl = `${siteBase}/`;
           <span class="pm-kicker" data-i="pmKicker">
             {en.pmKicker}
           </span>
-          <svg class="pm-xlogo" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-            ></path>
-          </svg>
         </div>
         <div class="pm-body">
           <h2 data-i="pmTitle">{en.pmTitle}</h2>
 
-          <article class="xcard">
-            <header class="xcard-top">
-              <div class="xcard-av" aria-hidden="true">
-                <img class="xcard-avimg" src={avatar} alt="" onerror="this.remove()" />
-                <span class="xcard-avm" data-i="pmMonogram">
-                  {en.pmMonogram}
-                </span>
-              </div>
-              <div class="xcard-id">
-                <div class="xcard-name">
-                  <span data-i="pmName">{en.pmName}</span>
-                  <svg
-                    class="xcard-check"
-                    viewBox="0 0 22 22"
-                    width="16"
-                    height="16"
-                    aria-label="verified"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M20.4 11c0-1.1-.6-2-1.5-2.5.2-.3.3-.7.3-1.1 0-1.3-1-2.3-2.3-2.3-.4 0-.8.1-1.1.3C15.3 4.6 14.4 4 13.3 4c-1 0-1.9.6-2.3 1.4C10.6 5.1 10.2 5 9.8 5 8.5 5 7.5 6 7.5 7.4c0 .4.1.8.3 1.1C7 9 6.4 9.9 6.4 11s.6 2 1.5 2.5c-.2.3-.3.7-.3 1.1 0 1.3 1 2.3 2.3 2.3.4 0 .8-.1 1.1-.3.5.9 1.4 1.5 2.5 1.5s1.9-.6 2.3-1.4c.3.2.7.3 1.1.3 1.3 0 2.3-1 2.3-2.3 0-.4-.1-.8-.3-1.1.9-.6 1.5-1.5 1.5-2.6zm-9.9 3.3-2.6-2.6 1.1-1.1 1.5 1.5 3.5-3.5 1.1 1.1z"
-                    ></path>
-                  </svg>
-                </div>
-                <div class="xcard-handle" data-i="pmHandle">
-                  {en.pmHandle}
-                </div>
-              </div>
-              <a class="xcard-src" href={pmUrl} target="_blank" rel="noopener" data-i="pmViewOn">
-                {en.pmViewOn}
-              </a>
-            </header>
-            <div class="xcard-text" data-i="pmBody" set:html={en.pmBody} />
-            <footer class="xcard-foot">
-              <span data-i="pmTime">{en.pmTime}</span> ·
-              <span class="xcard-views" data-i="pmViews">
-                {en.pmViews}
-              </span>
-            </footer>
-          </article>
+          <blockquote class="pm-quote" cite={pmUrl} data-i="pmBody" set:html={en.pmBody} />
+          <p class="pm-attrib">
+            <span data-i="pmAttrib" set:html={en.pmAttrib} />
+            <a href={pmUrl} target="_blank" rel="noopener" data-i="pmViewOn">
+              {en.pmViewOn}
+            </a>
+          </p>
 
           <p class="pm-quip" data-i="pmQuip" set:html={en.pmQuip} />
         </div>

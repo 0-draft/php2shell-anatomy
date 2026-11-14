@@ -34,18 +34,15 @@ export const content: Record<Lang, Record<string, any>> = {
       ['php2shell', '2026'],
     ],
 
-    pmKicker: 'URGENT BROADCAST',
+    pmKicker: 'QUOTED POST',
     pmTitle: 'Even the Prime Minister told you to patch tonight.',
-    pmName: 'Sanae Takaichi',
-    pmHandle: '@takaichi_sanae',
-    pmMonogram: 'ST',
     pmBody:
       'An urgent request for tonight.<br><br>PHP’s security team has issued an advisory about two critical vulnerabilities in PHP, which is used by a great many websites.<br><br>Please check whether your public sites use PHP, and prepare to apply the fix released tonight at 23:00 JST as quickly as possible.<br><br>If applying it promptly is difficult, temporarily taking the site offline is one effective way to reduce risk.<br><br>Our national cyber office is posting related information on its X account too, so please refer to that as well.',
-    pmTime: '9:55 PM · Oct 21, 2026',
-    pmViews: '3.24M views',
-    pmViewOn: 'View on X',
+    pmAttrib:
+      'Quoted from Prime Minister Sanae Takaichi (@takaichi_sanae) on X, posted shortly before 22:00 JST on 2026-10-21. English translation of the Japanese original.',
+    pmViewOn: 'Original post on X',
     pmQuip:
-      'When the head of government announces your maintenance window, “I’ll get to it after lunch” stops being a plan. <b>23:00 JST = 14:00 UTC</b>, the same clock ticking at the top of this page. That night, “emergency maintenance” out-trended the pop charts.',
+      'When the head of government announces your maintenance window, “I’ll get to it after lunch” stops being a plan. <b>23:00 JST = 14:00 UTC</b>, the same clock ticking at the top of this page.',
 
     nmWhy: "Why it's different",
     whyH: '“We’re not affected” doesn’t hold here.',
@@ -422,18 +419,15 @@ export const content: Record<Lang, Record<string, any>> = {
       ['php2shell', '2026'],
     ],
 
-    pmKicker: '緊急放送',
+    pmKicker: '投稿の引用',
     pmTitle: '首相まで「今夜パッチ当てて」と言ってくる脆弱性。',
-    pmName: '高市早苗',
-    pmHandle: '@takaichi_sanae',
-    pmMonogram: '高',
     pmBody:
       '皆様に、今夜に対応して頂きたい大至急のお願いです。<br><br>多くのウェブサイトで使用されているPHPに関し、PHPのセキュリティチームが、重大な2件の脆弱性に関する注意喚起を行っています。<br><br>公開しているウェブサイトでPHPを使用しているか確認し、今夜、10月21日午後11時（日本時間）に公開される修正パッチについて、可及的速やかに適用できるよう準備をお願いします。<br><br>修正パッチを速やかに適用することが困難な場合は、例えばウェブサイト等を一時的に停止させることも、リスクを低減させるための有効策の一つと考えられます。<br><br>国家サイバー統括室のXアカウントでも関係する情報を発信していますので、そちらも参考にして下さい。',
-    pmTime: '午後9:55 · 2026年10月21日',
-    pmViews: '324.2万 views',
-    pmViewOn: 'Xで見る',
+    pmAttrib:
+      '高市早苗首相(@takaichi_sanae)のX投稿より引用。2026年10月21日 22時前(日本時間)の投稿。',
+    pmViewOn: 'Xの元投稿',
     pmQuip:
-      '政府のトップにメンテ時刻を告知される脆弱性。「昼メシのあとで」はもう通用しない。<b>日本時間 今夜23:00 = 14:00 UTC</b>、このページ上部と同じ時計だ。その夜のXトレンドは、新曲より「緊急メンテ」が上に来た。',
+      '政府のトップにメンテ時刻を告知される脆弱性。「昼メシのあとで」はもう通用しない。<b>日本時間 今夜23:00 = 14:00 UTC</b>、このページ上部と同じ時計だ。',
 
     nmWhy: 'なぜ桁違いか',
     whyH: '「うちは関係ない」が通じない。',
