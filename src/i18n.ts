@@ -10,7 +10,7 @@ export const content: Record<Lang, Record<string, any>> = {
     badge: 'ZERO-DAY · AWARENESS',
     crit: 'CVSS v4.0 9.2 · CRITICAL',
     h1: 'One plain POST,<br>and PHP is <span class="g">theirs</span>.',
-    sub: 'No upload form. No login. A single ordinary HTTP&nbsp;POST is reported to run code on nearly <span class="hot">every server running PHP</span>. That is php2shell. This page exists so you patch before it reaches you.',
+    sub: 'No upload form. No login. PHP’s own advisories confirm unauthenticated code execution over ordinary HTTP on <span class="hot">Apache mod_php</span>. On PHP-FPM it was shown through the CVE-2026-109619 session path, and CVE-2026-109618 is rated susceptible there from source analysis. That is php2shell. This page exists so you patch before it reaches you.',
     statusHead: 'patch status · fixed 2026-10-21 · CISA KEV 2026-10-26',
     stats: [
       ['9.2', 'CVSS v4.0', ''],
@@ -34,18 +34,15 @@ export const content: Record<Lang, Record<string, any>> = {
       ['php2shell', '2026'],
     ],
 
-    pmKicker: 'URGENT BROADCAST',
+    pmKicker: 'QUOTED POST',
     pmTitle: 'Even the Prime Minister told you to patch tonight.',
-    pmName: 'Sanae Takaichi',
-    pmHandle: '@takaichi_sanae',
-    pmMonogram: 'ST',
     pmBody:
       'An urgent request for tonight.<br><br>PHP’s security team has issued an advisory about two critical vulnerabilities in PHP, which is used by a great many websites.<br><br>Please check whether your public sites use PHP, and prepare to apply the fix released tonight at 23:00 JST as quickly as possible.<br><br>If applying it promptly is difficult, temporarily taking the site offline is one effective way to reduce risk.<br><br>Our national cyber office is posting related information on its X account too, so please refer to that as well.',
-    pmTime: '9:55 PM · Oct 21, 2026',
-    pmViews: '3.24M views',
-    pmViewOn: 'View on X',
+    pmAttrib:
+      'Quoted from Prime Minister Sanae Takaichi (@takaichi_sanae) on X, posted shortly before 22:00 JST on 2026-10-21. English translation of the Japanese original.',
+    pmViewOn: 'Original post on X',
     pmQuip:
-      'When the head of government announces your maintenance window, “I’ll get to it after lunch” stops being a plan. <b>23:00 JST = 14:00 UTC</b>, the same clock ticking at the top of this page. That night, “emergency maintenance” out-trended the pop charts.',
+      'When the head of government announces your maintenance window, “I’ll get to it after lunch” stops being a plan. <b>23:00 JST = 14:00 UTC</b>, the same clock ticking at the top of this page.',
 
     nmWhy: "Why it's different",
     whyH: '“We’re not affected” doesn’t hold here.',
@@ -148,6 +145,7 @@ export const content: Record<Lang, Record<string, any>> = {
     seqPlay: 'Play the attack',
     seqReplay: 'Replay',
     seqThreat: 'threat',
+    seqIllus: 'illustrative replay · not real data',
     seqNodes: {
       attacker: 'Attacker',
       edge: 'Edge / WAF',
@@ -158,7 +156,7 @@ export const content: Record<Lang, Record<string, any>> = {
     attackTerm: [
       [
         '$ mass-scan 0.0.0.0/0 :80,443',
-        '[+] 4,812,339 PHP hosts fingerprinted',
+        '[+] N,NNN,NNN PHP hosts fingerprinted',
         '[>] target.example.com → PHP 8.3 · in range',
       ],
       [
@@ -167,11 +165,11 @@ export const content: Record<Lang, Record<string, any>> = {
         '[+] code execution as www-data',
       ],
       ['$ id → uid=33(www-data)', '$ cat config.php', '[+] DB_PASS and API keys captured'],
-      ['[*] dumping users …', '[+] 2,391,114 records exfiltrated', '[+] 17 live API keys taken'],
+      ['[*] dumping users …', '[+] NNN,NNN records exfiltrated', '[+] NN live API keys taken'],
       [
         '$ mysql -h db-internal …',
         '[+] pivoted into 10.0.0.0/24',
-        '[+] 3 internal hosts reachable',
+        '[+] N internal hosts reachable',
       ],
       ['[*] planting backdoor …', '[+] persistence established', '[!] ransomware staged'],
     ],
@@ -366,20 +364,34 @@ export const content: Record<Lang, Record<string, any>> = {
       ],
       [
         '04',
+        'PHP 8.5: turn off fatal error backtraces',
+        '',
+        'Only if you cannot update yet. Set <code>fatal_error_backtraces=0</code> in php.ini or the FPM pool (not per request) and restart every worker. This removes the producer in the confirmed CVE-2026-109619 RCE path. Partial only: it does not cover other request-owned state.',
+        false,
+      ],
+      [
+        '05',
+        'Remove the per-request memory limit',
+        '',
+        'Only if you cannot update yet. Set and enforce <code>memory_limit=-1</code> administratively for CVE-2026-109618, restart every worker, and check that no pool, directory or app setting restores a finite limit. PHP itself calls this incomplete: a failed underlying allocation can still hit the bug. Keep <code>post_max_size</code> conservative while it is on.',
+        false,
+      ],
+      [
+        '06',
         'Upgrade anything end-of-life',
         '',
         '8.1, 8.0, 7.x and 5.x get no official release. Take a vendor backport if you have one, then upgrade to 8.3+.',
         false,
       ],
       [
-        '05',
+        '07',
         'Watch for post-exploitation',
         '',
         'Alert on the web process spawning a shell, unfamiliar child processes, or new files in web dirs. Right after the patch is public is when scanning spikes.',
         false,
       ],
       [
-        '06',
+        '08',
         'Verify, don’t assume',
         '',
         'Confirm the running PHP version on every host: containers, legacy VMs, that one forgotten box. Fleets fail where a single unpatched server hides.',
@@ -398,7 +410,7 @@ export const content: Record<Lang, Record<string, any>> = {
     badge: 'ゼロデイ · 注意喚起',
     crit: 'CVSS v4.0 9.2 · 緊急',
     h1: 'ただのPOSTで、<br>PHPは<span class="g">奪われる</span>。',
-    sub: 'アップロード欄も、ログインも要らない。何の変哲もないHTTP&nbsp;POST一発で、<span class="hot">PHPが動くほぼ全サーバー</span>でコードが走る、とされる。それが php2shell。手遅れになる前にパッチを当ててほしくて、このページを作った。',
+    sub: 'アップロード欄も、ログインも要らない。PHP公式アドバイザリによれば、普通のHTTPリクエストからの未認証コード実行が <span class="hot">Apache mod_php</span> で実証済み。PHP-FPM では CVE-2026-109619 のセッション経路で実証され、CVE-2026-109618 もソース解析上は影響を受けるとされる。それが php2shell。手遅れになる前にパッチを当ててほしくて、このページを作った。',
     statusHead: 'パッチ状況 · 2026-10-21 修正 · CISA KEV 2026-10-26',
     stats: [
       ['9.2', 'CVSS v4.0', ''],
@@ -422,18 +434,15 @@ export const content: Record<Lang, Record<string, any>> = {
       ['php2shell', '2026'],
     ],
 
-    pmKicker: '緊急放送',
+    pmKicker: '投稿の引用',
     pmTitle: '首相まで「今夜パッチ当てて」と言ってくる脆弱性。',
-    pmName: '高市早苗',
-    pmHandle: '@takaichi_sanae',
-    pmMonogram: '高',
     pmBody:
       '皆様に、今夜に対応して頂きたい大至急のお願いです。<br><br>多くのウェブサイトで使用されているPHPに関し、PHPのセキュリティチームが、重大な2件の脆弱性に関する注意喚起を行っています。<br><br>公開しているウェブサイトでPHPを使用しているか確認し、今夜、10月21日午後11時（日本時間）に公開される修正パッチについて、可及的速やかに適用できるよう準備をお願いします。<br><br>修正パッチを速やかに適用することが困難な場合は、例えばウェブサイト等を一時的に停止させることも、リスクを低減させるための有効策の一つと考えられます。<br><br>国家サイバー統括室のXアカウントでも関係する情報を発信していますので、そちらも参考にして下さい。',
-    pmTime: '午後9:55 · 2026年10月21日',
-    pmViews: '324.2万 views',
-    pmViewOn: 'Xで見る',
+    pmAttrib:
+      '高市早苗首相(@takaichi_sanae)のX投稿より引用。2026年10月21日 22時前(日本時間)の投稿。',
+    pmViewOn: 'Xの元投稿',
     pmQuip:
-      '政府のトップにメンテ時刻を告知される脆弱性。「昼メシのあとで」はもう通用しない。<b>日本時間 今夜23:00 = 14:00 UTC</b>、このページ上部と同じ時計だ。その夜のXトレンドは、新曲より「緊急メンテ」が上に来た。',
+      '政府のトップにメンテ時刻を告知される脆弱性。「昼メシのあとで」はもう通用しない。<b>日本時間 今夜23:00 = 14:00 UTC</b>、このページ上部と同じ時計だ。',
 
     nmWhy: 'なぜ桁違いか',
     whyH: '「うちは関係ない」が通じない。',
@@ -536,6 +545,7 @@ export const content: Record<Lang, Record<string, any>> = {
     seqPlay: '攻撃を再生',
     seqReplay: 'もう一度',
     seqThreat: '脅威度',
+    seqIllus: '説明用の再現 · 実データではない',
     seqNodes: {
       attacker: '攻撃者',
       edge: 'エッジ / WAF',
@@ -546,7 +556,7 @@ export const content: Record<Lang, Record<string, any>> = {
     attackTerm: [
       [
         '$ 0.0.0.0/0 を一斉スキャン :80,443',
-        '[+] PHPホスト 4,812,339 台を特定',
+        '[+] PHPホスト N,NNN,NNN 台を特定',
         '[>] target.example.com → PHP 8.3 ・範囲内',
       ],
       [
@@ -557,10 +567,10 @@ export const content: Record<Lang, Record<string, any>> = {
       ['$ id → uid=33(www-data)', '$ cat config.php', '[+] DB_PASS・APIキーを取得'],
       [
         '[*] users テーブルを吸い出し …',
-        '[+] 2,391,114 件を外部送信',
-        '[+] 有効なAPIキー 17 本を奪取',
+        '[+] NNN,NNN 件を外部送信',
+        '[+] 有効なAPIキー NN 本を奪取',
       ],
-      ['$ mysql -h db-internal …', '[+] 10.0.0.0/24 へ横移動', '[+] 内部ホスト 3 台に到達'],
+      ['$ mysql -h db-internal …', '[+] 10.0.0.0/24 へ横移動', '[+] 内部ホスト N 台に到達'],
       ['[*] バックドアを設置 …', '[+] 永続化を確立', '[!] ランサムウェアを配置'],
     ],
 
@@ -763,20 +773,34 @@ export const content: Record<Lang, Record<string, any>> = {
       ],
       [
         '04',
+        'PHP 8.5: 致命的エラーのバックトレースを切る',
+        '',
+        'すぐ更新できない場合だけ。php.ini か FPM プールで <code>fatal_error_backtraces=0</code>(リクエスト単位の上書きではなく)にし、全ワーカーを再起動。CVE-2026-109619 で確認された RCE 経路の起点を取り除く。部分的な緩和で、他のリクエスト所有の状態はカバーしない。',
+        false,
+      ],
+      [
+        '05',
+        'リクエスト単位のメモリ上限を外す',
+        '',
+        'すぐ更新できない場合だけ。CVE-2026-109618 向けに <code>memory_limit=-1</code> を管理者設定で強制し、全ワーカーを再起動。プール・ディレクトリ・アプリの設定で有限の上限が戻っていないか確認する。PHP 自身が不完全な緩和と明言している。下層のメモリ確保が失敗すれば、まだバグに届く。有効にしている間は <code>post_max_size</code> を控えめに保つ。',
+        false,
+      ],
+      [
+        '06',
         'EOL版は上げる',
         '',
         '8.1・8.0・7.x・5.x に公式リリースは出ない。ベンダーのバックポートがあれば入れ、8.3+ へ上げる。',
         false,
       ],
       [
-        '05',
+        '07',
         '侵入後の兆候を監視',
         '',
         'Webプロセスがシェルを起動、見慣れぬ子プロセス、Webディレクトリの新規ファイルにアラート。パッチ公開直後こそスキャンが急増する。',
         false,
       ],
       [
-        '06',
+        '08',
         '思い込まず、検証する',
         '',
         '全ホストで稼働PHP版を確認。コンテナ、旧VM、忘れられた1台。艦隊は、未適用の1台が隠れている所から破られる。',

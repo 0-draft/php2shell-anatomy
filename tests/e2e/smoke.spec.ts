@@ -7,9 +7,8 @@ test('renders the page with live status and no app errors', async ({ page }) => 
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
     const text = m.text();
-    // External fonts and the optional PM avatar (handled by an onerror fallback)
-    // are not app bugs.
-    if (/fonts\.g|favicon|pm-avatar|net::ERR/i.test(text)) return;
+    // External fonts are not app bugs.
+    if (/fonts\.g|favicon|net::ERR/i.test(text)) return;
     errors.push(text);
   });
   page.on('pageerror', (e) => errors.push(e.message));
@@ -22,7 +21,7 @@ test('renders the page with live status and no app errors', async ({ page }) => 
   await expect(page.locator('#expVerdict h3')).not.toBeEmpty();
   // every plate renders its cards
   await expect(page.locator('#whyCards .why-card')).toHaveCount(4);
-  await expect(page.locator('#defs .def')).toHaveCount(6);
+  await expect(page.locator('#defs .def')).toHaveCount(8);
   await expect(page.locator('#matrix .mrow:not(.head)')).toHaveCount(6);
   await expect(page.locator('#distroMatrix .mrow:not(.head)')).toHaveCount(10);
   await expect(page.locator('#tl .tl-item')).toHaveCount(6);
