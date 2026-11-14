@@ -10,7 +10,7 @@ export const content: Record<Lang, Record<string, any>> = {
     badge: 'ZERO-DAY · AWARENESS',
     crit: 'CVSS v4.0 9.2 · CRITICAL',
     h1: 'One plain POST,<br>and PHP is <span class="g">theirs</span>.',
-    sub: 'No upload form. No login. A single ordinary HTTP&nbsp;POST is reported to run code on nearly <span class="hot">every server running PHP</span>. That is php2shell. This page exists so you patch before it reaches you.',
+    sub: 'No upload form. No login. PHP’s own advisories confirm unauthenticated code execution over ordinary HTTP on <span class="hot">Apache mod_php</span>. On PHP-FPM it was shown through the CVE-2026-109619 session path, and CVE-2026-109618 is rated susceptible there from source analysis. That is php2shell. This page exists so you patch before it reaches you.',
     statusHead: 'patch status · fixed 2026-10-21 · CISA KEV 2026-10-26',
     stats: [
       ['9.2', 'CVSS v4.0', ''],
@@ -410,7 +410,7 @@ export const content: Record<Lang, Record<string, any>> = {
     badge: 'ゼロデイ · 注意喚起',
     crit: 'CVSS v4.0 9.2 · 緊急',
     h1: 'ただのPOSTで、<br>PHPは<span class="g">奪われる</span>。',
-    sub: 'アップロード欄も、ログインも要らない。何の変哲もないHTTP&nbsp;POST一発で、<span class="hot">PHPが動くほぼ全サーバー</span>でコードが走る、とされる。それが php2shell。手遅れになる前にパッチを当ててほしくて、このページを作った。',
+    sub: 'アップロード欄も、ログインも要らない。PHP公式アドバイザリによれば、普通のHTTPリクエストからの未認証コード実行が <span class="hot">Apache mod_php</span> で実証済み。PHP-FPM では CVE-2026-109619 のセッション経路で実証され、CVE-2026-109618 もソース解析上は影響を受けるとされる。それが php2shell。手遅れになる前にパッチを当ててほしくて、このページを作った。',
     statusHead: 'パッチ状況 · 2026-10-21 修正 · CISA KEV 2026-10-26',
     stats: [
       ['9.2', 'CVSS v4.0', ''],
