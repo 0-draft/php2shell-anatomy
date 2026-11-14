@@ -1142,6 +1142,7 @@ footer .sig {
 }
 .atk-screen-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -1153,6 +1154,15 @@ footer .sig {
   font-size: 12px;
   letter-spacing: 0.14em;
   color: var(--ink-3);
+}
+.atk-illus {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  border: 1px dashed var(--line-2);
+  border-radius: 6px;
+  padding: 2px 8px;
 }
 .atk-threat {
   display: flex;

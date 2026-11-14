@@ -145,6 +145,7 @@ export const content: Record<Lang, Record<string, any>> = {
     seqPlay: 'Play the attack',
     seqReplay: 'Replay',
     seqThreat: 'threat',
+    seqIllus: 'illustrative replay · not real data',
     seqNodes: {
       attacker: 'Attacker',
       edge: 'Edge / WAF',
@@ -155,7 +156,7 @@ export const content: Record<Lang, Record<string, any>> = {
     attackTerm: [
       [
         '$ mass-scan 0.0.0.0/0 :80,443',
-        '[+] 4,812,339 PHP hosts fingerprinted',
+        '[+] N,NNN,NNN PHP hosts fingerprinted',
         '[>] target.example.com → PHP 8.3 · in range',
       ],
       [
@@ -164,11 +165,11 @@ export const content: Record<Lang, Record<string, any>> = {
         '[+] code execution as www-data',
       ],
       ['$ id → uid=33(www-data)', '$ cat config.php', '[+] DB_PASS and API keys captured'],
-      ['[*] dumping users …', '[+] 2,391,114 records exfiltrated', '[+] 17 live API keys taken'],
+      ['[*] dumping users …', '[+] NNN,NNN records exfiltrated', '[+] NN live API keys taken'],
       [
         '$ mysql -h db-internal …',
         '[+] pivoted into 10.0.0.0/24',
-        '[+] 3 internal hosts reachable',
+        '[+] N internal hosts reachable',
       ],
       ['[*] planting backdoor …', '[+] persistence established', '[!] ransomware staged'],
     ],
@@ -530,6 +531,7 @@ export const content: Record<Lang, Record<string, any>> = {
     seqPlay: '攻撃を再生',
     seqReplay: 'もう一度',
     seqThreat: '脅威度',
+    seqIllus: '説明用の再現 · 実データではない',
     seqNodes: {
       attacker: '攻撃者',
       edge: 'エッジ / WAF',
@@ -540,7 +542,7 @@ export const content: Record<Lang, Record<string, any>> = {
     attackTerm: [
       [
         '$ 0.0.0.0/0 を一斉スキャン :80,443',
-        '[+] PHPホスト 4,812,339 台を特定',
+        '[+] PHPホスト N,NNN,NNN 台を特定',
         '[>] target.example.com → PHP 8.3 ・範囲内',
       ],
       [
@@ -551,10 +553,10 @@ export const content: Record<Lang, Record<string, any>> = {
       ['$ id → uid=33(www-data)', '$ cat config.php', '[+] DB_PASS・APIキーを取得'],
       [
         '[*] users テーブルを吸い出し …',
-        '[+] 2,391,114 件を外部送信',
-        '[+] 有効なAPIキー 17 本を奪取',
+        '[+] NNN,NNN 件を外部送信',
+        '[+] 有効なAPIキー NN 本を奪取',
       ],
-      ['$ mysql -h db-internal …', '[+] 10.0.0.0/24 へ横移動', '[+] 内部ホスト 3 台に到達'],
+      ['$ mysql -h db-internal …', '[+] 10.0.0.0/24 へ横移動', '[+] 内部ホスト N 台に到達'],
       ['[*] バックドアを設置 …', '[+] 永続化を確立', '[!] ランサムウェアを配置'],
     ],
 
